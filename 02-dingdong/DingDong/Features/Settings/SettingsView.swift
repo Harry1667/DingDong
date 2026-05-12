@@ -9,24 +9,23 @@ struct SettingsView: View {
             ZStack {
                 Color.appBackground.ignoresSafeArea()
                 List {
-                    Section("通知設定") {
-                        Picker("通知頻率", selection: $vm.notifyMode) {
-                            ForEach(NotifyMode.allCases, id: \.self) { mode in
-                                Text(mode.displayName).tag(mode)
-                            }
-                        }
-                        .foregroundStyle(Color.appTextPrimary)
-
+                    Section("通知") {
                         Stepper(value: $vm.notifyThreshold, in: 1...20) {
                             HStack {
-                                Text("提醒閾值")
+                                Text("提前提醒")
                                     .foregroundStyle(Color.appTextPrimary)
                                 Spacer()
                                 Text("差 \(vm.notifyThreshold) 號")
                                     .font(.system(size: 13, design: .monospaced))
-                                    .foregroundStyle(Color.appTextSecondary)
+                                    .foregroundStyle(Color.appGreen)
                             }
                         }
+
+                        Toggle(isOn: $vm.hapticEnabled) {
+                            Text("震動提示")
+                                .foregroundStyle(Color.appTextPrimary)
+                        }
+                        .tint(Color.appGreen)
 
                         if !notificationService.isAuthorized {
                             Button {
@@ -39,20 +38,26 @@ struct SettingsView: View {
                     }
                     .listRowBackground(Color.appSurface)
 
+                    Section("更新頻率") {
+                        Picker("更新頻率", selection: $vm.refreshInterval) {
+                            Text("30 秒").tag(30)
+                            Text("1 分鐘").tag(60)
+                            Text("2 分鐘").tag(120)
+                        }
+                        .pickerStyle(.segmented)
+                        .listRowBackground(Color.appSurface)
+
+                        Text("更新越頻繁越省電越耗電；背景追蹤建議 30 秒")
+                            .font(.system(size: 12))
+                            .foregroundStyle(Color.appTextSecondary)
+                    }
+                    .listRowBackground(Color.appSurface)
+
                     Section("關於") {
                         LabeledContent("版本", value: Bundle.main.appVersion)
                             .foregroundStyle(Color.appTextPrimary)
                         LabeledContent("資料來源", value: "dd.dl-app.com")
                             .foregroundStyle(Color.appTextPrimary)
-                        LabeledContent("支援醫院", value: "29 間")
-                            .foregroundStyle(Color.appTextPrimary)
-                    }
-                    .listRowBackground(Color.appSurface)
-
-                    Section("說明") {
-                        Text("叮咚到號會自動追蹤您選擇的醫師看診進度，每 30 秒更新一次。切換至背景後，系統會定期喚醒 App 繼續追蹤。")
-                            .font(.system(size: 12))
-                            .foregroundStyle(Color.appTextSecondary)
                     }
                     .listRowBackground(Color.appSurface)
                 }

@@ -38,6 +38,19 @@ final class PersistenceService {
         set { defaults.set(newValue.rawValue, forKey: "notify_mode") }
     }
 
+    var refreshInterval: Int {
+        get { defaults.integer(forKey: "refresh_interval").nonZero ?? 30 }
+        set { defaults.set(newValue, forKey: "refresh_interval") }
+    }
+
+    var hapticEnabled: Bool {
+        get {
+            guard defaults.object(forKey: "haptic_enabled") != nil else { return true }
+            return defaults.bool(forKey: "haptic_enabled")
+        }
+        set { defaults.set(newValue, forKey: "haptic_enabled") }
+    }
+
     var onboardingDone: Bool {
         get { defaults.bool(forKey: "onboarding_done") }
         set { defaults.set(newValue, forKey: "onboarding_done") }
@@ -118,14 +131,6 @@ enum NotifyMode: String, Codable, CaseIterable {
         case .light:  return "重要時機提醒"
         case .normal: return "每次更新提醒"
         case .final_: return "輪到時才提醒"
-        }
-    }
-
-    var description: String {
-        switch self {
-        case .light:  return "差 10、5、3、1 號時提醒"
-        case .normal: return "每次號碼變動都提醒"
-        case .final_: return "剩最後 3 號時提醒"
         }
     }
 }

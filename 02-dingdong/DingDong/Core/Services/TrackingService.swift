@@ -7,6 +7,7 @@ final class TrackingService: ObservableObject {
     private init() {
         tasks = PersistenceService.shared.trackingTasks
             .filter { !$0.isFinished }
+        activateScheduledTasks()
         startPollingTimer()
     }
 
@@ -24,7 +25,8 @@ final class TrackingService: ObservableObject {
         hospital: Hospital,
         progress: ClinicProgress,
         userNumber: Int?,
-        threshold: Int
+        threshold: Int,
+        scheduledDate: Date? = nil
     ) async throws {
         guard tasks.count < Self.maxTasks else {
             throw TrackingError.maxTasksReached
@@ -40,7 +42,16 @@ final class TrackingService: ObservableObject {
             throw TrackingError.alreadyTracking
         }
 
-        var task = TrackingTask(
+        // 判斷是否為未來日期
+        let isFuture: Bool
+        if let date = scheduledDate {
+            isFuture = date > Calendar.current.startOfDay(for: Date())
+                    && !Calendar.current.isDateInToday(date)
+        } else {
+            isFuture = false
+        }
+
+        let task = TrackingTask(
             id: UUID(),
             dbId: nil,
             hospitalCode: hospital.code,
@@ -50,15 +61,18 @@ final class TrackingService: ObservableObject {
             clinicRoom: progress.clinicRoom,
             userNumber: userNumber,
             threshold: threshold,
+            scheduledDate: isFuture ? scheduledDate : nil,
             currentNumber: progress.currentNumber,
             lastUpdated: Date(),
-            status: .active
+            status: isFuture ? .scheduled : .active
         )
 
         tasks.append(task)
         persist()
 
-        // 背景記錄到後端
+        guard !isFuture else { return }
+
+        // 背景記錄到後端（只有立即追蹤才送）
         Task.detached(priority: .background) { [task] in
             let request = TrackStartRequest(
                 guestId: PersistenceService.shared.guestId,
@@ -110,9 +124,28 @@ final class TrackingService: ObservableObject {
         persist()
     }
 
+    // MARK: - 預約任務啟動
+
+    // 將到期的預約任務升級為 active
+    func activateScheduledTasks() {
+        let today = Calendar.current.startOfDay(for: Date())
+        var changed = false
+        for i in tasks.indices {
+            guard tasks[i].status == .scheduled else { continue }
+            let taskDay = tasks[i].scheduledDate.map { Calendar.current.startOfDay(for: $0) } ?? today
+            if taskDay <= today {
+                tasks[i].status = .active
+                tasks[i].lastUpdated = Date()
+                changed = true
+            }
+        }
+        if changed { persist() }
+    }
+
     // MARK: - 輪詢
 
     func refreshAllTasks() async {
+        activateScheduledTasks()
         let activeTasks = tasks.filter { $0.status == .active }
         guard !activeTasks.isEmpty else { return }
 
@@ -120,9 +153,7 @@ final class TrackingService: ObservableObject {
 
         await withTaskGroup(of: Void.self) { group in
             for code in hospitalCodes {
-                group.addTask {
-                    await self.poll(hospitalCode: code)
-                }
+                group.addTask { await self.poll(hospitalCode: code) }
             }
         }
     }
@@ -157,7 +188,6 @@ final class TrackingService: ObservableObject {
 
             tasks[i].currentNumber = newNumber
             tasks[i].lastUpdated = Date()
-
             evaluateNotification(taskIndex: i)
         }
 
@@ -167,20 +197,16 @@ final class TrackingService: ObservableObject {
     private func evaluateNotification(taskIndex i: Int) {
         var task = tasks[i]
         guard task.status == .active else { return }
-
         guard let userNumber = task.userNumber else { return }
 
         let cur = task.currentNumber
 
         if cur > userNumber {
-            // 過號
             task.status = .skipped
             task.skippedReminderCount += 1
             tasks[i] = task
             notifications.sendSkipped(task: task, reminderCount: task.skippedReminderCount)
-            if task.skippedReminderCount >= 3 {
-                removeFinished(taskId: task.id)
-            }
+            if task.skippedReminderCount >= 3 { removeFinished(taskId: task.id) }
             return
         }
 
@@ -193,17 +219,14 @@ final class TrackingService: ObservableObject {
         }
 
         let remaining = userNumber - cur
-        let mode = persistence.notifyMode
         let threshold = task.threshold
+        let mode = persistence.notifyMode
 
         let shouldNotify: Bool
         switch mode {
-        case .light:
-            shouldNotify = [10, 5, 3, 2, 1].contains(remaining) && remaining <= threshold
-        case .normal:
-            shouldNotify = remaining <= threshold
-        case .final_:
-            shouldNotify = remaining <= 3
+        case .light:  shouldNotify = [10, 5, 3, 2, 1].contains(remaining) && remaining <= threshold
+        case .normal: shouldNotify = remaining <= threshold
+        case .final_: shouldNotify = remaining <= 3
         }
 
         if shouldNotify {
@@ -220,8 +243,14 @@ final class TrackingService: ObservableObject {
 
     // MARK: - Timer
 
-    private func startPollingTimer() {
-        pollingTimer = Timer.scheduledTimer(withTimeInterval: 30, repeats: true) { [weak self] _ in
+    func restartPollingTimer() {
+        pollingTimer?.invalidate()
+        startPollingTimer()
+    }
+
+    func startPollingTimer() {
+        let interval = TimeInterval(persistence.refreshInterval)
+        pollingTimer = Timer.scheduledTimer(withTimeInterval: interval, repeats: true) { [weak self] _ in
             Task { await self?.refreshAllTasks() }
         }
     }

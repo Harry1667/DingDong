@@ -4,6 +4,8 @@ import Foundation
 final class TrackingViewModel: ObservableObject {
     @Published var userNumberText = ""
     @Published var threshold: Int = 5
+    @Published var scheduledDate: Date = Calendar.current.startOfDay(for: Date())
+    @Published var isSchedulingFuture: Bool = false
     @Published var isLoading = false
     @Published var errorMessage: String?
     @Published var didStartTracking = false
@@ -27,6 +29,10 @@ final class TrackingViewModel: ObservableObject {
         return n - progress.currentNumber
     }
 
+    var effectiveScheduledDate: Date? {
+        isSchedulingFuture ? scheduledDate : nil
+    }
+
     func startTracking() async {
         isLoading = true
         errorMessage = nil
@@ -37,7 +43,8 @@ final class TrackingViewModel: ObservableObject {
                 hospital: hospital,
                 progress: progress,
                 userNumber: userNumber,
-                threshold: threshold
+                threshold: threshold,
+                scheduledDate: effectiveScheduledDate
             )
             didStartTracking = true
         } catch {

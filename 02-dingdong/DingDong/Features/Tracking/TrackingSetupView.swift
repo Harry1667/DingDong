@@ -16,6 +16,7 @@ struct TrackingSetupView: View {
                     VStack(spacing: 20) {
                         doctorInfoCard
                         numberInputSection
+                        scheduleDateSection
                         thresholdSection
                         startButton
                     }
@@ -119,6 +120,40 @@ struct TrackingSetupView: View {
         }
     }
 
+    private var scheduleDateSection: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            HStack {
+                Text("看診日期")
+                    .font(.system(size: 14, weight: .semibold))
+                    .foregroundStyle(Color.appTextPrimary)
+                Spacer()
+                Toggle("", isOn: $vm.isSchedulingFuture)
+                    .tint(Color.appGreen)
+                    .labelsHidden()
+            }
+
+            if vm.isSchedulingFuture {
+                DatePicker(
+                    "",
+                    selection: $vm.scheduledDate,
+                    in: Calendar.current.date(byAdding: .day, value: 1, to: Date())!...,
+                    displayedComponents: .date
+                )
+                .datePickerStyle(.graphical)
+                .tint(Color.appGreen)
+                .labelsHidden()
+
+                Text("追蹤將於該日開診時自動啟動，診結後自動移除")
+                    .font(.system(size: 12))
+                    .foregroundStyle(Color.appTextSecondary)
+            } else {
+                Text("今天，立即開始追蹤")
+                    .font(.system(size: 13))
+                    .foregroundStyle(Color.appTextSecondary)
+            }
+        }
+    }
+
     private var thresholdSection: some View {
         VStack(alignment: .leading, spacing: 10) {
             Text("提醒時機")
@@ -149,8 +184,8 @@ struct TrackingSetupView: View {
                     ProgressView().tint(.white)
                 } else {
                     HStack(spacing: 8) {
-                        Image(systemName: "bell.badge.fill")
-                        Text("開始追蹤")
+                        Image(systemName: vm.isSchedulingFuture ? "calendar.badge.clock" : "bell.badge.fill")
+                        Text(vm.isSchedulingFuture ? "預約追蹤" : "開始追蹤")
                             .font(.system(size: 16, weight: .semibold))
                     }
                 }
@@ -164,14 +199,4 @@ struct TrackingSetupView: View {
         .disabled(vm.isLoading)
         .padding(.top, 4)
     }
-}
-
-#Preview {
-    TrackingSetupView(
-        hospital: Hospital(code: "NTU", name: "台大醫院", shortName: "台大",
-                           city: "台北市", district: "中正區", level: "醫學中心", isActive: true),
-        progress: ClinicProgress(department: "內科", doctorName: "王小明", clinicRoom: "診間 03",
-                                 currentNumber: 42, nextNumber: 43,
-                                 isCurrentSkipped: false, isNextSkipped: false)
-    )
 }

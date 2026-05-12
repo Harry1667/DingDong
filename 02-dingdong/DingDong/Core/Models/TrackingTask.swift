@@ -13,13 +13,14 @@ struct TrackingTask: Codable, Identifiable {
     let userNumber: Int?
     let threshold: Int
 
+    var scheduledDate: Date?   // nil = 今天立即啟動
+
     var currentNumber: Int
     var lastUpdated: Date
     var status: TrackingStatus
 
     var skippedReminderCount: Int = 0
 
-    // 剩餘號數（有掛號號碼才有意義）
     var remaining: Int? {
         guard let userNumber else { return nil }
         return userNumber - currentNumber
@@ -28,14 +29,21 @@ struct TrackingTask: Codable, Identifiable {
     var isFinished: Bool {
         status == .finished || status == .cancelled || status == .notified
     }
+
+    // 是否還在等待預約日期
+    var isScheduledForFuture: Bool {
+        guard status == .scheduled, let date = scheduledDate else { return false }
+        return date > Calendar.current.startOfDay(for: Date())
+    }
 }
 
 enum TrackingStatus: String, Codable {
-    case active    // 追蹤中
-    case notified  // 已通知輪到
-    case skipped   // 已過號
-    case finished  // 看診結束
-    case cancelled // 使用者停止
+    case scheduled  // 預約中，等待開診日
+    case active     // 追蹤中
+    case notified   // 已通知輪到
+    case skipped    // 已過號
+    case finished   // 看診結束
+    case cancelled  // 使用者停止
 }
 
 // MARK: - API Request / Response
