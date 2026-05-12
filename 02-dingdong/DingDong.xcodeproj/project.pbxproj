@@ -1,0 +1,776 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		0295A9E6CEE3EC3B2B7BCBB3 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B3DC59835551B2D9593CADD /* ContentView.swift */; };
+		035E34C0F3C34C6B01C03C0D /* PersistenceService.swift in Sources */ = {isa = PBXBuildFile; fileRef = D80A7DD95B61C69A496A963A /* PersistenceService.swift */; };
+		10359DC152A53390315F4E73 /* DingDongTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC7E047E7B21AF52774967EB /* DingDongTests.swift */; };
+		11A68C00BBA8CCC994149B15 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8977C0668638980EE823CF2B /* HomeView.swift */; };
+		120C2F1F36C149B6F43CA53E /* Department.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18487FFF1B81D0062D9A7341 /* Department.swift */; };
+		193CAFF5394D087EF694BDED /* TrackingWidgetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C02FACDE6E49EC17C1F66E97 /* TrackingWidgetView.swift */; };
+		1CBF318A00E9EB7E5D13982A /* SettingsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8E045F00E425736EE91FD40 /* SettingsViewModel.swift */; };
+		1D19092BD2CBA0BA30EE76F0 /* Color+App.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E67FC69B6D4227F97DEC9C1 /* Color+App.swift */; };
+		229701DFF7C089E68981E3D8 /* View+Modifiers.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4B84451F2E25040BEC62415 /* View+Modifiers.swift */; };
+		2353B86E18744DBC207598B9 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D2A9DBBB5A332D648D53A77B /* Assets.xcassets */; };
+		3BEFBEDD5999C60C694ABA48 /* TrackingWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3FC11CB931BA24BF7E1B12DE /* TrackingWidget.swift */; };
+		3F6E3AED07A5D2F5349329AB /* NetworkError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F6DD637326164791BE97FC8 /* NetworkError.swift */; };
+		4533C90BECA4730B46577DCA /* DoctorProgressCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64140CE06EA3624430388F6C /* DoctorProgressCard.swift */; };
+		4A30F21818DF457E8DB95E57 /* Hospital.swift in Sources */ = {isa = PBXBuildFile; fileRef = C12E6606490CBBA463788A3E /* Hospital.swift */; };
+		4EADB90179F68A5ACD3056C3 /* HospitalListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B402005068A9B86B875AD40 /* HospitalListView.swift */; };
+		4EDB38DB4176EA72834B5D16 /* Date+Format.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAC46440727540EE551EBFBF /* Date+Format.swift */; };
+		5150DC462C5CC9B5C567566E /* DepartmentListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8240D79A0737C86AEA68647E /* DepartmentListView.swift */; };
+		5500046F1CAE58CB1022A2E8 /* APIEndpoints.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2447A380B3A0D387F1B2D0B3 /* APIEndpoints.swift */; };
+		599B5644C42FD3561E9258DB /* DingDongApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 358A1ABF8AA601E685010907 /* DingDongApp.swift */; };
+		5E283EB1E484B678099B24A5 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D2A83542D370E305219121F /* SettingsView.swift */; };
+		6EC31FEE74F33C756A883095 /* HospitalService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B5AFDC9C7D87F3351CFE393 /* HospitalService.swift */; };
+		704AC4751259C50E2455033A /* NotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0EAD0FADD90CCE838645E05A /* NotificationService.swift */; };
+		78BAF58B65529DDD63CD03F6 /* TrackingService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 109744E674F69704C64F5E31 /* TrackingService.swift */; };
+		82B5CD09466EEFC59777BDEA /* TrackingTask.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFC74B270C11F1CCD2C83CFE /* TrackingTask.swift */; };
+		8A91FE60AAC1AA55B25F3ACF /* TrackingDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EBA7080FD6BFE0E29676C6A /* TrackingDetailView.swift */; };
+		90A4E3925717726238E7344E /* WidgetBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27AF999C35C4C2DC01DA2C74 /* WidgetBundle.swift */; };
+		9266846490D8FE26ED5EAFF0 /* TrackingCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DD000E1AB14808509716D4C /* TrackingCardView.swift */; };
+		A2FC1F60F7D7DFAC9804B6DB /* HospitalRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1967B99B92C5A21BC02E387 /* HospitalRowView.swift */; };
+		A444AC7347610448E111DD12 /* TrackingViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7603E460B0DB59FFA0586433 /* TrackingViewModel.swift */; };
+		AB4BA9E1B1CDB7831D2331D2 /* ClinicProgress.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0680433D2C4CED3B39A3C78B /* ClinicProgress.swift */; };
+		B388E6B8345FE02BEF8AEB24 /* APIClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB3159CF9817B9F2D796E16D /* APIClient.swift */; };
+		B8319335BC4CC95574B57025 /* HomeViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = EC6B3BDDB738C55C76BB904D /* HomeViewModel.swift */; };
+		BADBEAC401BC5EBA4A77B687 /* DingDongWidget.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = E8244940C886712205A84E78 /* DingDongWidget.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		C2CC8CB3D34581EB71E279F2 /* TrackingWidgetEntry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1483446407A15BDA837C8D61 /* TrackingWidgetEntry.swift */; };
+		D1933A3AE79B724D7DDEF7A1 /* HospitalViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B00DD0FD4633AE71127B76C1 /* HospitalViewModel.swift */; };
+		D9C0762DD8A5C7522856BC07 /* ProgressViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DDB66360F9109151128FE7F /* ProgressViewModel.swift */; };
+		DF38D6552DEDD8AEFB71D829 /* DoctorListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DAAF5DB0E604EFD9E9206C6 /* DoctorListView.swift */; };
+		EAEE40514AAAC5C9F10C3F91 /* BackgroundService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 62F16FE7C17EFA1F8FB97670 /* BackgroundService.swift */; };
+		F82B3B452B20DD8EDDC72FA9 /* TrackingSetupView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B9C4B1289B4E72C151C0FD5A /* TrackingSetupView.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		48E02FEF1F0CD6F2669A7BDA /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 0300FC9AA46D2E62661927D9 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 90992014731336976464595F;
+			remoteInfo = DingDongWidget;
+		};
+		6156BDB56D3ED954299F226C /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 0300FC9AA46D2E62661927D9 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = E440C0070A6136F0B22F326E;
+			remoteInfo = DingDong;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		3C47B39E80EC0A43C8895D1D /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				BADBEAC401BC5EBA4A77B687 /* DingDongWidget.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		0680433D2C4CED3B39A3C78B /* ClinicProgress.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClinicProgress.swift; sourceTree = "<group>"; };
+		08BCD18054096EED732887C6 /* DingDong.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = DingDong.entitlements; sourceTree = "<group>"; };
+		0B3DC59835551B2D9593CADD /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		0EAD0FADD90CCE838645E05A /* NotificationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationService.swift; sourceTree = "<group>"; };
+		109744E674F69704C64F5E31 /* TrackingService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackingService.swift; sourceTree = "<group>"; };
+		1483446407A15BDA837C8D61 /* TrackingWidgetEntry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackingWidgetEntry.swift; sourceTree = "<group>"; };
+		18487FFF1B81D0062D9A7341 /* Department.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Department.swift; sourceTree = "<group>"; };
+		1DF05B5BA47FF2CC2A568F73 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		2447A380B3A0D387F1B2D0B3 /* APIEndpoints.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIEndpoints.swift; sourceTree = "<group>"; };
+		27AF999C35C4C2DC01DA2C74 /* WidgetBundle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetBundle.swift; sourceTree = "<group>"; };
+		358A1ABF8AA601E685010907 /* DingDongApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DingDongApp.swift; sourceTree = "<group>"; };
+		3FC11CB931BA24BF7E1B12DE /* TrackingWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackingWidget.swift; sourceTree = "<group>"; };
+		4B402005068A9B86B875AD40 /* HospitalListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HospitalListView.swift; sourceTree = "<group>"; };
+		4D2A83542D370E305219121F /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		62F16FE7C17EFA1F8FB97670 /* BackgroundService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackgroundService.swift; sourceTree = "<group>"; };
+		64140CE06EA3624430388F6C /* DoctorProgressCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DoctorProgressCard.swift; sourceTree = "<group>"; };
+		6DDB66360F9109151128FE7F /* ProgressViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressViewModel.swift; sourceTree = "<group>"; };
+		70C7661D853130DEAC475D03 /* DingDongWidget.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = DingDongWidget.entitlements; sourceTree = "<group>"; };
+		7603E460B0DB59FFA0586433 /* TrackingViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackingViewModel.swift; sourceTree = "<group>"; };
+		7E67FC69B6D4227F97DEC9C1 /* Color+App.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Color+App.swift"; sourceTree = "<group>"; };
+		8240D79A0737C86AEA68647E /* DepartmentListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DepartmentListView.swift; sourceTree = "<group>"; };
+		8977C0668638980EE823CF2B /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
+		8DAAF5DB0E604EFD9E9206C6 /* DoctorListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DoctorListView.swift; sourceTree = "<group>"; };
+		8DD000E1AB14808509716D4C /* TrackingCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackingCardView.swift; sourceTree = "<group>"; };
+		8F6DD637326164791BE97FC8 /* NetworkError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkError.swift; sourceTree = "<group>"; };
+		9B5AFDC9C7D87F3351CFE393 /* HospitalService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HospitalService.swift; sourceTree = "<group>"; };
+		9EBA7080FD6BFE0E29676C6A /* TrackingDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackingDetailView.swift; sourceTree = "<group>"; };
+		A8E045F00E425736EE91FD40 /* SettingsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewModel.swift; sourceTree = "<group>"; };
+		AB3159CF9817B9F2D796E16D /* APIClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIClient.swift; sourceTree = "<group>"; };
+		B00DD0FD4633AE71127B76C1 /* HospitalViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HospitalViewModel.swift; sourceTree = "<group>"; };
+		B4B84451F2E25040BEC62415 /* View+Modifiers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "View+Modifiers.swift"; sourceTree = "<group>"; };
+		B9C4B1289B4E72C151C0FD5A /* TrackingSetupView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackingSetupView.swift; sourceTree = "<group>"; };
+		BFC74B270C11F1CCD2C83CFE /* TrackingTask.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackingTask.swift; sourceTree = "<group>"; };
+		C02FACDE6E49EC17C1F66E97 /* TrackingWidgetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackingWidgetView.swift; sourceTree = "<group>"; };
+		C0649A827D0451A2AF769595 /* DingDongTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = DingDongTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		C12E6606490CBBA463788A3E /* Hospital.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Hospital.swift; sourceTree = "<group>"; };
+		D2A9DBBB5A332D648D53A77B /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		D80A7DD95B61C69A496A963A /* PersistenceService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersistenceService.swift; sourceTree = "<group>"; };
+		DC7E047E7B21AF52774967EB /* DingDongTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DingDongTests.swift; sourceTree = "<group>"; };
+		DFBE68C736188A02826266E0 /* DingDong.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = DingDong.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		E1967B99B92C5A21BC02E387 /* HospitalRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HospitalRowView.swift; sourceTree = "<group>"; };
+		E8244940C886712205A84E78 /* DingDongWidget.appex */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = "wrapper.app-extension"; path = DingDongWidget.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		EC6B3BDDB738C55C76BB904D /* HomeViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeViewModel.swift; sourceTree = "<group>"; };
+		FAC46440727540EE551EBFBF /* Date+Format.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Date+Format.swift"; sourceTree = "<group>"; };
+		FEE9A4D620F76740487EA801 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXGroup section */
+		04695C87DC5AFF156AAAF2B5 /* Tracking */ = {
+			isa = PBXGroup;
+			children = (
+				9EBA7080FD6BFE0E29676C6A /* TrackingDetailView.swift */,
+				B9C4B1289B4E72C151C0FD5A /* TrackingSetupView.swift */,
+				7603E460B0DB59FFA0586433 /* TrackingViewModel.swift */,
+			);
+			path = Tracking;
+			sourceTree = "<group>";
+		};
+		0F41B21038E2C65104AEB9D4 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				DFBE68C736188A02826266E0 /* DingDong.app */,
+				C0649A827D0451A2AF769595 /* DingDongTests.xctest */,
+				E8244940C886712205A84E78 /* DingDongWidget.appex */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		20D5233891D7768B043E8CB9 /* Network */ = {
+			isa = PBXGroup;
+			children = (
+				AB3159CF9817B9F2D796E16D /* APIClient.swift */,
+				2447A380B3A0D387F1B2D0B3 /* APIEndpoints.swift */,
+				8F6DD637326164791BE97FC8 /* NetworkError.swift */,
+			);
+			path = Network;
+			sourceTree = "<group>";
+		};
+		22584AD5D00DE054C30710AE /* Home */ = {
+			isa = PBXGroup;
+			children = (
+				8977C0668638980EE823CF2B /* HomeView.swift */,
+				EC6B3BDDB738C55C76BB904D /* HomeViewModel.swift */,
+				8DD000E1AB14808509716D4C /* TrackingCardView.swift */,
+			);
+			path = Home;
+			sourceTree = "<group>";
+		};
+		2AAC2B81223CC5286341BE5E /* App */ = {
+			isa = PBXGroup;
+			children = (
+				0B3DC59835551B2D9593CADD /* ContentView.swift */,
+				358A1ABF8AA601E685010907 /* DingDongApp.swift */,
+			);
+			path = App;
+			sourceTree = "<group>";
+		};
+		3A0AD7F837D708C8DE9EC907 /* DingDongWidget */ = {
+			isa = PBXGroup;
+			children = (
+				70C7661D853130DEAC475D03 /* DingDongWidget.entitlements */,
+				FEE9A4D620F76740487EA801 /* Info.plist */,
+				3FC11CB931BA24BF7E1B12DE /* TrackingWidget.swift */,
+				1483446407A15BDA837C8D61 /* TrackingWidgetEntry.swift */,
+				C02FACDE6E49EC17C1F66E97 /* TrackingWidgetView.swift */,
+				27AF999C35C4C2DC01DA2C74 /* WidgetBundle.swift */,
+			);
+			path = DingDongWidget;
+			sourceTree = "<group>";
+		};
+		523C592B3C67022B520386E8 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				D2A9DBBB5A332D648D53A77B /* Assets.xcassets */,
+				1DF05B5BA47FF2CC2A568F73 /* Info.plist */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+		6AF640AAD6921D38CE495747 /* Core */ = {
+			isa = PBXGroup;
+			children = (
+				CFF45BED2668AA572B9D00F1 /* Extensions */,
+				73E1BF6797FE48110E3B48AD /* Models */,
+				20D5233891D7768B043E8CB9 /* Network */,
+				C72F483D323F98189F160116 /* Services */,
+			);
+			path = Core;
+			sourceTree = "<group>";
+		};
+		73E1BF6797FE48110E3B48AD /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				0680433D2C4CED3B39A3C78B /* ClinicProgress.swift */,
+				18487FFF1B81D0062D9A7341 /* Department.swift */,
+				C12E6606490CBBA463788A3E /* Hospital.swift */,
+				BFC74B270C11F1CCD2C83CFE /* TrackingTask.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		74EAEFB99E0425DC1F029540 /* Features */ = {
+			isa = PBXGroup;
+			children = (
+				22584AD5D00DE054C30710AE /* Home */,
+				EE7AE4A18DD935C4A209F66F /* Hospital */,
+				791E40AAA23327F90DDB601C /* Progress */,
+				CA6E7C6527F318206C8935C3 /* Settings */,
+				04695C87DC5AFF156AAAF2B5 /* Tracking */,
+			);
+			path = Features;
+			sourceTree = "<group>";
+		};
+		77C9E54822D07D96722F0130 /* DingDongTests */ = {
+			isa = PBXGroup;
+			children = (
+				DC7E047E7B21AF52774967EB /* DingDongTests.swift */,
+			);
+			path = DingDongTests;
+			sourceTree = "<group>";
+		};
+		791E40AAA23327F90DDB601C /* Progress */ = {
+			isa = PBXGroup;
+			children = (
+				8240D79A0737C86AEA68647E /* DepartmentListView.swift */,
+				8DAAF5DB0E604EFD9E9206C6 /* DoctorListView.swift */,
+				64140CE06EA3624430388F6C /* DoctorProgressCard.swift */,
+				6DDB66360F9109151128FE7F /* ProgressViewModel.swift */,
+			);
+			path = Progress;
+			sourceTree = "<group>";
+		};
+		ADD571E5FE2551F22CA28431 /* DingDong */ = {
+			isa = PBXGroup;
+			children = (
+				2AAC2B81223CC5286341BE5E /* App */,
+				6AF640AAD6921D38CE495747 /* Core */,
+				74EAEFB99E0425DC1F029540 /* Features */,
+				523C592B3C67022B520386E8 /* Resources */,
+				08BCD18054096EED732887C6 /* DingDong.entitlements */,
+			);
+			path = DingDong;
+			sourceTree = "<group>";
+		};
+		C72F483D323F98189F160116 /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				62F16FE7C17EFA1F8FB97670 /* BackgroundService.swift */,
+				9B5AFDC9C7D87F3351CFE393 /* HospitalService.swift */,
+				0EAD0FADD90CCE838645E05A /* NotificationService.swift */,
+				D80A7DD95B61C69A496A963A /* PersistenceService.swift */,
+				109744E674F69704C64F5E31 /* TrackingService.swift */,
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
+		CA6E7C6527F318206C8935C3 /* Settings */ = {
+			isa = PBXGroup;
+			children = (
+				4D2A83542D370E305219121F /* SettingsView.swift */,
+				A8E045F00E425736EE91FD40 /* SettingsViewModel.swift */,
+			);
+			path = Settings;
+			sourceTree = "<group>";
+		};
+		CFF45BED2668AA572B9D00F1 /* Extensions */ = {
+			isa = PBXGroup;
+			children = (
+				7E67FC69B6D4227F97DEC9C1 /* Color+App.swift */,
+				FAC46440727540EE551EBFBF /* Date+Format.swift */,
+				B4B84451F2E25040BEC62415 /* View+Modifiers.swift */,
+			);
+			path = Extensions;
+			sourceTree = "<group>";
+		};
+		EE7AE4A18DD935C4A209F66F /* Hospital */ = {
+			isa = PBXGroup;
+			children = (
+				4B402005068A9B86B875AD40 /* HospitalListView.swift */,
+				E1967B99B92C5A21BC02E387 /* HospitalRowView.swift */,
+				B00DD0FD4633AE71127B76C1 /* HospitalViewModel.swift */,
+			);
+			path = Hospital;
+			sourceTree = "<group>";
+		};
+		FEF7864E9065A4E49BE04681 = {
+			isa = PBXGroup;
+			children = (
+				ADD571E5FE2551F22CA28431 /* DingDong */,
+				77C9E54822D07D96722F0130 /* DingDongTests */,
+				3A0AD7F837D708C8DE9EC907 /* DingDongWidget */,
+				0F41B21038E2C65104AEB9D4 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		333126FF0AE2FB08FEC4861F /* DingDongTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 79853F96F5563D63C879F687 /* Build configuration list for PBXNativeTarget "DingDongTests" */;
+			buildPhases = (
+				9C58102CB25581212EC7E57B /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				915C7395EA7D3113D75D9A8E /* PBXTargetDependency */,
+			);
+			name = DingDongTests;
+			packageProductDependencies = (
+			);
+			productName = DingDongTests;
+			productReference = C0649A827D0451A2AF769595 /* DingDongTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		90992014731336976464595F /* DingDongWidget */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 5154A91C06278DC9D97A4966 /* Build configuration list for PBXNativeTarget "DingDongWidget" */;
+			buildPhases = (
+				FBD13C82DBECA2DB5CD66C52 /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = DingDongWidget;
+			packageProductDependencies = (
+			);
+			productName = DingDongWidget;
+			productReference = E8244940C886712205A84E78 /* DingDongWidget.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
+		E440C0070A6136F0B22F326E /* DingDong */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = E1F39128E44F9A5DDB1A8EA4 /* Build configuration list for PBXNativeTarget "DingDong" */;
+			buildPhases = (
+				6A82EF8D9FCE49B799AB3BE4 /* Sources */,
+				FBF1A771C6C93C59273B8911 /* Resources */,
+				3C47B39E80EC0A43C8895D1D /* Embed Foundation Extensions */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				E3579AFF7BA08F7F958B8988 /* PBXTargetDependency */,
+			);
+			name = DingDong;
+			packageProductDependencies = (
+			);
+			productName = DingDong;
+			productReference = DFBE68C736188A02826266E0 /* DingDong.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		0300FC9AA46D2E62661927D9 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1500;
+				TargetAttributes = {
+					333126FF0AE2FB08FEC4861F = {
+						DevelopmentTeam = "";
+					};
+					90992014731336976464595F = {
+						DevelopmentTeam = "";
+					};
+					E440C0070A6136F0B22F326E = {
+						DevelopmentTeam = "";
+					};
+				};
+			};
+			buildConfigurationList = 2931F781BEA970B881E2D867 /* Build configuration list for PBXProject "DingDong" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+			);
+			mainGroup = FEF7864E9065A4E49BE04681;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			productRefGroup = 0F41B21038E2C65104AEB9D4 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				E440C0070A6136F0B22F326E /* DingDong */,
+				333126FF0AE2FB08FEC4861F /* DingDongTests */,
+				90992014731336976464595F /* DingDongWidget */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		FBF1A771C6C93C59273B8911 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				2353B86E18744DBC207598B9 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		6A82EF8D9FCE49B799AB3BE4 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B388E6B8345FE02BEF8AEB24 /* APIClient.swift in Sources */,
+				5500046F1CAE58CB1022A2E8 /* APIEndpoints.swift in Sources */,
+				EAEE40514AAAC5C9F10C3F91 /* BackgroundService.swift in Sources */,
+				AB4BA9E1B1CDB7831D2331D2 /* ClinicProgress.swift in Sources */,
+				1D19092BD2CBA0BA30EE76F0 /* Color+App.swift in Sources */,
+				0295A9E6CEE3EC3B2B7BCBB3 /* ContentView.swift in Sources */,
+				4EDB38DB4176EA72834B5D16 /* Date+Format.swift in Sources */,
+				120C2F1F36C149B6F43CA53E /* Department.swift in Sources */,
+				5150DC462C5CC9B5C567566E /* DepartmentListView.swift in Sources */,
+				599B5644C42FD3561E9258DB /* DingDongApp.swift in Sources */,
+				DF38D6552DEDD8AEFB71D829 /* DoctorListView.swift in Sources */,
+				4533C90BECA4730B46577DCA /* DoctorProgressCard.swift in Sources */,
+				11A68C00BBA8CCC994149B15 /* HomeView.swift in Sources */,
+				B8319335BC4CC95574B57025 /* HomeViewModel.swift in Sources */,
+				4A30F21818DF457E8DB95E57 /* Hospital.swift in Sources */,
+				4EADB90179F68A5ACD3056C3 /* HospitalListView.swift in Sources */,
+				A2FC1F60F7D7DFAC9804B6DB /* HospitalRowView.swift in Sources */,
+				6EC31FEE74F33C756A883095 /* HospitalService.swift in Sources */,
+				D1933A3AE79B724D7DDEF7A1 /* HospitalViewModel.swift in Sources */,
+				3F6E3AED07A5D2F5349329AB /* NetworkError.swift in Sources */,
+				704AC4751259C50E2455033A /* NotificationService.swift in Sources */,
+				035E34C0F3C34C6B01C03C0D /* PersistenceService.swift in Sources */,
+				D9C0762DD8A5C7522856BC07 /* ProgressViewModel.swift in Sources */,
+				5E283EB1E484B678099B24A5 /* SettingsView.swift in Sources */,
+				1CBF318A00E9EB7E5D13982A /* SettingsViewModel.swift in Sources */,
+				9266846490D8FE26ED5EAFF0 /* TrackingCardView.swift in Sources */,
+				8A91FE60AAC1AA55B25F3ACF /* TrackingDetailView.swift in Sources */,
+				78BAF58B65529DDD63CD03F6 /* TrackingService.swift in Sources */,
+				F82B3B452B20DD8EDDC72FA9 /* TrackingSetupView.swift in Sources */,
+				82B5CD09466EEFC59777BDEA /* TrackingTask.swift in Sources */,
+				A444AC7347610448E111DD12 /* TrackingViewModel.swift in Sources */,
+				229701DFF7C089E68981E3D8 /* View+Modifiers.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		9C58102CB25581212EC7E57B /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				10359DC152A53390315F4E73 /* DingDongTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		FBD13C82DBECA2DB5CD66C52 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				3BEFBEDD5999C60C694ABA48 /* TrackingWidget.swift in Sources */,
+				C2CC8CB3D34581EB71E279F2 /* TrackingWidgetEntry.swift in Sources */,
+				193CAFF5394D087EF694BDED /* TrackingWidgetView.swift in Sources */,
+				90A4E3925717726238E7344E /* WidgetBundle.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		915C7395EA7D3113D75D9A8E /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = E440C0070A6136F0B22F326E /* DingDong */;
+			targetProxy = 6156BDB56D3ED954299F226C /* PBXContainerItemProxy */;
+		};
+		E3579AFF7BA08F7F958B8988 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 90992014731336976464595F /* DingDongWidget */;
+			targetProxy = 48E02FEF1F0CD6F2669A7BDA /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		0E0819E63F0DA97C0B3A2F35 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.ajz.dingdong.tests;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/DingDong.app/DingDong";
+			};
+			name = Release;
+		};
+		628D89B05C615C9863E57F1C /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = DingDongWidget/DingDongWidget.entitlements;
+				INFOPLIST_FILE = DingDongWidget/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.ajz.dingdong.widget;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Release;
+		};
+		89FF9F1EB3EBBE49E0CBC158 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.ajz.dingdong.tests;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/DingDong.app/DingDong";
+			};
+			name = Debug;
+		};
+		8AB053EB5C156D4999701D87 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = "";
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				MARKETING_VERSION = 1.0.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.9;
+			};
+			name = Debug;
+		};
+		A5480294DEB374EE72B72962 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = DingDongWidget/DingDongWidget.entitlements;
+				INFOPLIST_FILE = DingDongWidget/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.ajz.dingdong.widget;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Debug;
+		};
+		DEB3357CC55BC3C5483236CF /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = "";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				MARKETING_VERSION = 1.0.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.9;
+			};
+			name = Release;
+		};
+		E2F92463631665AE80D25342 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = DingDong/DingDong.entitlements;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				INFOPLIST_FILE = DingDong/Resources/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.ajz.dingdong;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Release;
+		};
+		EC285992506E95E26DB97CAD /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = DingDong/DingDong.entitlements;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				INFOPLIST_FILE = DingDong/Resources/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.ajz.dingdong;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Debug;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		2931F781BEA970B881E2D867 /* Build configuration list for PBXProject "DingDong" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				8AB053EB5C156D4999701D87 /* Debug */,
+				DEB3357CC55BC3C5483236CF /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		5154A91C06278DC9D97A4966 /* Build configuration list for PBXNativeTarget "DingDongWidget" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A5480294DEB374EE72B72962 /* Debug */,
+				628D89B05C615C9863E57F1C /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		79853F96F5563D63C879F687 /* Build configuration list for PBXNativeTarget "DingDongTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				89FF9F1EB3EBBE49E0CBC158 /* Debug */,
+				0E0819E63F0DA97C0B3A2F35 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		E1F39128E44F9A5DDB1A8EA4 /* Build configuration list for PBXNativeTarget "DingDong" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				EC285992506E95E26DB97CAD /* Debug */,
+				E2F92463631665AE80D25342 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 0300FC9AA46D2E62661927D9 /* Project object */;
+}

@@ -1,0 +1,63 @@
+# === Secrets（絕對不准進 git）===
+.env
+.env.*
+!.env.example
+*.key
+*.pem
+*.p12
+*.pfx
+id_rsa
+id_ed25519
+ssh-key-*
+*-credentials.json
+service-account*.json
+
+# === 機密目錄 ===
+dindon-web/
+03-Skills/
+_secrets/
+private/
+01-dev/0-run.md
+01-dev/10-deploy-docs/
+01-dev/9-talk.md
+
+# === Build 產物 ===
+node_modules/
+dist/
+build/
+.next/
+out/
+.cache/
+.vite/
+.turbo/
+.svelte-kit/
+02-dingdong/DingDong.xcodeproj/xcuserdata/
+02-dingdong/DingDong.xcodeproj/project.xcworkspace/xcuserdata/
+*.xcuserstate
+
+# === Database ===
+*.sqlite
+*.sqlite3
+*.db
+
+# === Logs ===
+*.log
+logs/
+npm-debug.log*
+
+# === OS / IDE ===
+.DS_Store
+Thumbs.db
+._*
+.vscode/*
+!.vscode/extensions.json
+.idea/
+*.swp
+*.swo
+
+# === 暫存 ===
+tmp/
+temp/
+*.tmp
+.scratch/
+.gstack/

@@ -1,0 +1,71 @@
+name: DingDong
+
+options:
+  bundleIdPrefix: com.ajz
+  deploymentTarget:
+    iOS: "16.0"
+  xcodeVersion: "15.0"
+  createIntermediateGroups: true
+  groupSortPosition: top
+
+settings:
+  base:
+    SWIFT_VERSION: "5.9"
+    MARKETING_VERSION: "1.0.0"
+    CURRENT_PROJECT_VERSION: "1"
+    DEVELOPMENT_TEAM: ""
+
+targets:
+
+  DingDong:
+    type: application
+    platform: iOS
+    deploymentTarget: "16.0"
+    sources:
+      - path: DingDong
+    resources:
+      - path: DingDong/Resources/Assets.xcassets
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.ajz.dingdong
+        INFOPLIST_FILE: DingDong/Resources/Info.plist
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: AccentColor
+        TARGETED_DEVICE_FAMILY: "1"
+    entitlements:
+      path: DingDong/DingDong.entitlements
+      properties:
+        com.apple.security.application-groups:
+          - group.com.ajz.dingdong
+    dependencies:
+      - target: DingDongWidget
+        embed: true
+
+  DingDongWidget:
+    type: app-extension
+    platform: iOS
+    deploymentTarget: "16.0"
+    sources:
+      - path: DingDongWidget
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.ajz.dingdong.widget
+        INFOPLIST_FILE: DingDongWidget/Info.plist
+        TARGETED_DEVICE_FAMILY: "1"
+    entitlements:
+      path: DingDongWidget/DingDongWidget.entitlements
+      properties:
+        com.apple.security.application-groups:
+          - group.com.ajz.dingdong
+
+  DingDongTests:
+    type: bundle.unit-test
+    platform: iOS
+    deploymentTarget: "16.0"
+    sources:
+      - path: DingDongTests
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.ajz.dingdong.tests
+    dependencies:
+      - target: DingDong
