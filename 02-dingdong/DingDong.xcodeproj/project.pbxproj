@@ -19,6 +19,7 @@
 		2353B86E18744DBC207598B9 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D2A9DBBB5A332D648D53A77B /* Assets.xcassets */; };
 		3BEFBEDD5999C60C694ABA48 /* TrackingWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3FC11CB931BA24BF7E1B12DE /* TrackingWidget.swift */; };
 		3F6E3AED07A5D2F5349329AB /* NetworkError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F6DD637326164791BE97FC8 /* NetworkError.swift */; };
+		424B8C7B06B89385F811EF02 /* Date+Format.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAC46440727540EE551EBFBF /* Date+Format.swift */; };
 		4533C90BECA4730B46577DCA /* DoctorProgressCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64140CE06EA3624430388F6C /* DoctorProgressCard.swift */; };
 		4A30F21818DF457E8DB95E57 /* Hospital.swift in Sources */ = {isa = PBXBuildFile; fileRef = C12E6606490CBBA463788A3E /* Hospital.swift */; };
 		4EADB90179F68A5ACD3056C3 /* HospitalListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B402005068A9B86B875AD40 /* HospitalListView.swift */; };
@@ -26,6 +27,7 @@
 		5150DC462C5CC9B5C567566E /* DepartmentListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8240D79A0737C86AEA68647E /* DepartmentListView.swift */; };
 		5500046F1CAE58CB1022A2E8 /* APIEndpoints.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2447A380B3A0D387F1B2D0B3 /* APIEndpoints.swift */; };
 		599B5644C42FD3561E9258DB /* DingDongApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 358A1ABF8AA601E685010907 /* DingDongApp.swift */; };
+		59A46B67F0019338B8A0AE94 /* TrackingTask.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFC74B270C11F1CCD2C83CFE /* TrackingTask.swift */; };
 		5E283EB1E484B678099B24A5 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D2A83542D370E305219121F /* SettingsView.swift */; };
 		6EC31FEE74F33C756A883095 /* HospitalService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B5AFDC9C7D87F3351CFE393 /* HospitalService.swift */; };
 		704AC4751259C50E2455033A /* NotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0EAD0FADD90CCE838645E05A /* NotificationService.swift */; };
@@ -477,6 +479,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				424B8C7B06B89385F811EF02 /* Date+Format.swift in Sources */,
+				59A46B67F0019338B8A0AE94 /* TrackingTask.swift in Sources */,
 				3BEFBEDD5999C60C694ABA48 /* TrackingWidget.swift in Sources */,
 				C2CC8CB3D34581EB71E279F2 /* TrackingWidgetEntry.swift in Sources */,
 				193CAFF5394D087EF694BDED /* TrackingWidgetView.swift in Sources */,

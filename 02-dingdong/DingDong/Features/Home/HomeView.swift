@@ -11,11 +11,20 @@ struct HomeView: View {
 
     var body: some View {
         NavigationStack {
-            Group {
-                if vm.tasks.isEmpty {
-                    emptyState
-                } else {
-                    trackingList
+            ZStack {
+                Color.appBackground.ignoresSafeArea()
+                    .opacity(breatheOpacity)
+                    .animation(
+                        .easeInOut(duration: 4).repeatForever(autoreverses: true),
+                        value: breatheOpacity
+                    )
+
+                Group {
+                    if vm.tasks.isEmpty {
+                        emptyState
+                    } else {
+                        trackingList
+                    }
                 }
             }
             .navigationTitle("叮咚到號")
@@ -27,6 +36,7 @@ struct HomeView: View {
                             Task { await trackingService.refreshAllTasks() }
                         } label: {
                             Image(systemName: "arrow.clockwise")
+                                .foregroundStyle(Color.appGreen)
                         }
                     }
                 }
@@ -38,11 +48,15 @@ struct HomeView: View {
                 await notificationService.requestAuthorization()
             }
         }
+        .onAppear { breatheOpacity = 0.94 }
     }
+
+    // Breathing background
+    @State private var breatheOpacity: Double = 1.0
 
     private var trackingList: some View {
         ScrollView {
-            VStack(spacing: 12) {
+            VStack(spacing: 16) {
                 ForEach(vm.tasks) { task in
                     TrackingCardView(task: task) {
                         trackingService.stopTracking(taskId: task.id)
@@ -53,51 +67,71 @@ struct HomeView: View {
                     addMoreButton
                 }
             }
-            .padding()
+            .padding(.horizontal, 20)
+            .padding(.top, 8)
+            .padding(.bottom, 32)
         }
     }
 
     private var addMoreButton: some View {
         NavigationLink(destination: HospitalListView()) {
-            Label("新增追蹤", systemImage: "plus.circle.fill")
-                .font(.subheadline.bold())
-                .frame(maxWidth: .infinity)
-                .padding()
-                .background(Color.appGreenLight)
-                .foregroundStyle(Color.appGreen)
-                .clipShape(RoundedRectangle(cornerRadius: 16))
+            HStack(spacing: 8) {
+                Image(systemName: "plus.circle.fill")
+                Text("新增追蹤")
+                    .font(.system(size: 14, weight: .semibold))
+            }
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 14)
+            .background(Color.appGreenLight)
+            .foregroundStyle(Color.appGreen)
+            .clipShape(RoundedRectangle(cornerRadius: 16))
         }
     }
 
     private var emptyState: some View {
-        VStack(spacing: 24) {
+        VStack(spacing: 32) {
             Spacer()
-            Image(systemName: "stethoscope.circle")
-                .font(.system(size: 72))
-                .foregroundStyle(Color.appGreen.opacity(0.4))
 
-            VStack(spacing: 8) {
-                Text("尚未追蹤任何醫師")
-                    .font(.title3.bold())
-                Text("選擇醫院，輸入掛號號碼\n輪到您時立即通知")
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
-                    .multilineTextAlignment(.center)
+            VStack(spacing: 16) {
+                // Large serif number as decorative element
+                Text("—")
+                    .font(.system(size: 72, weight: .bold, design: .serif))
+                    .foregroundStyle(Color.appGreen.opacity(0.25))
+
+                VStack(spacing: 8) {
+                    Text("尚未追蹤任何醫師")
+                        .font(.system(size: 18, weight: .semibold))
+                        .foregroundStyle(Color.appTextPrimary)
+                    Text("選擇醫院，輸入掛號號碼\n輪到您時立即通知")
+                        .font(.system(size: 15))
+                        .foregroundStyle(Color.appTextSecondary)
+                        .multilineTextAlignment(.center)
+                        .lineSpacing(4)
+                }
             }
 
             NavigationLink(destination: HospitalListView()) {
-                Label("選擇醫院", systemImage: "cross.case.fill")
-                    .font(.headline)
-                    .frame(maxWidth: .infinity)
-                    .padding()
-                    .background(Color.appGreen)
-                    .foregroundStyle(.white)
-                    .clipShape(RoundedRectangle(cornerRadius: 16))
+                HStack(spacing: 8) {
+                    Image(systemName: "cross.case.fill")
+                    Text("選擇醫院")
+                        .font(.system(size: 16, weight: .semibold))
+                }
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 16)
+                .background(Color.appGreen)
+                .foregroundStyle(.white)
+                .clipShape(RoundedRectangle(cornerRadius: 20))
             }
-            .padding(.horizontal, 32)
+            .padding(.horizontal, 40)
 
             Spacer()
         }
         .padding()
     }
+}
+
+#Preview("空白狀態") {
+    HomeView()
+        .environmentObject(TrackingService.shared)
+        .environmentObject(NotificationService.shared)
 }

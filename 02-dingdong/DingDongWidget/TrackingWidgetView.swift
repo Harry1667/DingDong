@@ -1,6 +1,17 @@
 import SwiftUI
 import WidgetKit
 
+private extension View {
+    @ViewBuilder
+    func widgetBackground() -> some View {
+        if #available(iOS 17, *) {
+            self.containerBackground(.fill, for: .widget)
+        } else {
+            self.background(.regularMaterial)
+        }
+    }
+}
+
 struct TrackingWidgetView: View {
     let entry: TrackingEntry
     @Environment(\.widgetFamily) var family
@@ -27,7 +38,7 @@ struct TrackingWidgetView: View {
                 .foregroundStyle(.secondary)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .containerBackground(.fill, for: .widget)
+        .widgetBackground()
     }
 
     private func smallView(task: TrackingWidgetData) -> some View {
@@ -57,7 +68,7 @@ struct TrackingWidgetView: View {
                 .foregroundStyle(.tertiary)
         }
         .padding(12)
-        .containerBackground(.fill, for: .widget)
+        .widgetBackground()
     }
 
     private var mediumView: some View {
@@ -90,6 +101,6 @@ struct TrackingWidgetView: View {
             }
         }
         .padding(14)
-        .containerBackground(.fill, for: .widget)
+        .widgetBackground()
     }
 }

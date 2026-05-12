@@ -7,19 +7,21 @@ struct DoctorListView: View {
     @ObservedObject var progressVM: ProgressViewModel
 
     @State private var selectedDoctor: ClinicProgress?
-    @State private var showTrackingSetup = false
 
     var body: some View {
-        ScrollView {
-            LazyVStack(spacing: 12) {
-                ForEach(progressVM.doctors(for: department)) { doctor in
-                    DoctorProgressCard(progress: doctor) {
-                        selectedDoctor = doctor
-                        showTrackingSetup = true
+        ZStack {
+            Color.appBackground.ignoresSafeArea()
+            ScrollView {
+                LazyVStack(spacing: 12) {
+                    ForEach(progressVM.doctors(for: department)) { doctor in
+                        DoctorProgressCard(progress: doctor) {
+                            selectedDoctor = doctor
+                        }
                     }
                 }
+                .padding(.horizontal, 20)
+                .padding(.vertical, 16)
             }
-            .padding()
         }
         .navigationTitle(department)
         .navigationBarTitleDisplayMode(.inline)

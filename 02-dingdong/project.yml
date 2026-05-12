@@ -47,6 +47,8 @@ targets:
     deploymentTarget: "16.0"
     sources:
       - path: DingDongWidget
+      - path: DingDong/Core/Models/TrackingTask.swift
+      - path: DingDong/Core/Extensions/Date+Format.swift
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.ajz.dingdong.widget

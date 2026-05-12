@@ -23,3 +23,9 @@ struct ContentView: View {
         .tint(Color.appGreen)
     }
 }
+
+#Preview {
+    ContentView()
+        .environmentObject(TrackingService.shared)
+        .environmentObject(NotificationService.shared)
+}

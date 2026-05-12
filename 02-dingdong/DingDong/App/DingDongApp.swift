@@ -13,6 +13,7 @@ struct DingDongApp: App {
             ContentView()
                 .environmentObject(trackingService)
                 .environmentObject(notificationService)
+                .background(Color.appBackground.ignoresSafeArea())
         }
     }
 }
