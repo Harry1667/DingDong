@@ -4,19 +4,20 @@ struct HomeView: View {
     @EnvironmentObject var trackingService: TrackingService
     @EnvironmentObject var notificationService: NotificationService
     @StateObject private var vm: HomeViewModel
+    @Environment(\.scenePhase) private var scenePhase
+
+    @State private var glowPulse = false
+    @State private var feedbackTask: TrackingTask?
 
     init() {
         _vm = StateObject(wrappedValue: HomeViewModel(trackingService: TrackingService.shared))
     }
-
-    @State private var glowPulse: Bool = false
 
     var body: some View {
         NavigationStack {
             ZStack {
                 Color.appBackground.ignoresSafeArea()
                 ambientBackground
-
                 Group {
                     if vm.tasks.isEmpty {
                         emptyState
@@ -40,6 +41,11 @@ struct HomeView: View {
                 }
             }
         }
+        .sheet(item: $feedbackTask) { task in
+            StopFeedbackSheet(task: task) { reason in
+                trackingService.stopTracking(taskId: task.id, reason: reason)
+            }
+        }
         .task {
             await notificationService.checkAuthorizationStatus()
             if !notificationService.isAuthorized {
@@ -51,26 +57,29 @@ struct HomeView: View {
                 glowPulse = true
             }
         }
+        .onChange(of: scenePhase) { phase in
+            if phase == .background {
+                BackgroundService.shared.scheduleNextRefresh()
+            }
+        }
     }
 
-    // MARK: - Task list (active + scheduled)
+    // MARK: - Task list
 
     private var taskList: some View {
         ScrollView {
             VStack(spacing: 20) {
-                // 進行中
                 let active = vm.tasks.filter { $0.status == .active }
                 if !active.isEmpty {
                     VStack(spacing: 12) {
                         ForEach(active) { task in
                             TrackingCardView(task: task) {
-                                trackingService.stopTracking(taskId: task.id)
+                                feedbackTask = task
                             }
                         }
                     }
                 }
 
-                // 預約中
                 let scheduled = vm.tasks.filter { $0.status == .scheduled }
                 if !scheduled.isEmpty {
                     VStack(alignment: .leading, spacing: 10) {
@@ -78,7 +87,6 @@ struct HomeView: View {
                             .font(.system(size: 12, weight: .semibold, design: .monospaced))
                             .foregroundStyle(Color.appTextSecondary)
                             .padding(.horizontal, 4)
-
                         ForEach(scheduled) { task in
                             scheduledCard(task: task)
                         }
@@ -106,9 +114,7 @@ struct HomeView: View {
                     .font(.system(size: 12, design: .monospaced))
                     .foregroundStyle(Color.appTextSecondary)
             }
-
             Spacer()
-
             VStack(alignment: .trailing, spacing: 2) {
                 if let date = task.scheduledDate {
                     Text(date, style: .date)
@@ -119,9 +125,8 @@ struct HomeView: View {
                     .font(.system(size: 11, design: .monospaced))
                     .foregroundStyle(Color.appTextSecondary)
             }
-
             Button {
-                trackingService.stopTracking(taskId: task.id)
+                trackingService.stopTracking(taskId: task.id, reason: "cancelled")
             } label: {
                 Image(systemName: "xmark.circle.fill")
                     .foregroundStyle(Color.appTextSecondary.opacity(0.4))
@@ -131,10 +136,7 @@ struct HomeView: View {
         .padding(14)
         .background(Color.appSurface)
         .clipShape(RoundedRectangle(cornerRadius: 14))
-        .overlay(
-            RoundedRectangle(cornerRadius: 14)
-                .stroke(Color.appBorder, lineWidth: 1)
-        )
+        .overlay(RoundedRectangle(cornerRadius: 14).stroke(Color.appBorder, lineWidth: 1))
     }
 
     private var addButton: some View {
@@ -157,12 +159,10 @@ struct HomeView: View {
     private var emptyState: some View {
         VStack(spacing: 32) {
             Spacer()
-
             VStack(spacing: 16) {
                 Text("—")
                     .font(.system(size: 72, weight: .bold, design: .serif))
                     .foregroundStyle(Color.appGreen.opacity(0.25))
-
                 VStack(spacing: 8) {
                     Text("尚未追蹤任何醫師")
                         .font(.system(size: 18, weight: .semibold))
@@ -174,7 +174,6 @@ struct HomeView: View {
                         .lineSpacing(4)
                 }
             }
-
             NavigationLink(destination: HospitalListView()) {
                 HStack(spacing: 8) {
                     Image(systemName: "cross.case.fill")
@@ -188,7 +187,6 @@ struct HomeView: View {
                 .clipShape(RoundedRectangle(cornerRadius: 20))
             }
             .padding(.horizontal, 40)
-
             Spacer()
         }
         .padding()
@@ -205,7 +203,6 @@ struct HomeView: View {
                     .blur(radius: 80)
                     .offset(x: -geo.size.width * 0.25, y: -geo.size.height * 0.05)
                     .scaleEffect(glowPulse ? 1.08 : 0.92)
-
                 Circle()
                     .fill(Color.appGreenMid.opacity(0.03))
                     .frame(width: geo.size.width * 0.6)

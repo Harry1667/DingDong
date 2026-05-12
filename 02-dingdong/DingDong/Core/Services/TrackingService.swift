@@ -72,8 +72,8 @@ final class TrackingService: ObservableObject {
 
         guard !isFuture else { return }
 
-        // 背景記錄到後端（只有立即追蹤才送）
-        Task.detached(priority: .background) { [task] in
+        let capturedToken = NotificationService.shared.apnsToken
+        Task.detached(priority: .background) { [task, capturedToken] in
             let request = TrackStartRequest(
                 guestId: PersistenceService.shared.guestId,
                 hospitalCode: task.hospitalCode,
@@ -81,7 +81,8 @@ final class TrackingService: ObservableObject {
                 doctorName: task.doctorName,
                 clinicRoom: task.clinicRoom,
                 session: nil,
-                userNumber: task.userNumber ?? 0
+                userNumber: task.userNumber ?? 0,
+                apnsToken: capturedToken
             )
             if let response = try? await APIClient.shared.post(
                 APIEndpoints.trackStart(),

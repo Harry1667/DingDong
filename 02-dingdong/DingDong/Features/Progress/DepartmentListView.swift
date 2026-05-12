@@ -97,17 +97,19 @@ struct DepartmentListView: View {
                 .font(.system(size: 14))
                 .foregroundStyle(Color.appTextSecondary)
                 .multilineTextAlignment(.center)
+            Button {
+                Task { await vm.load() }
+            } label: {
+                Text("重試")
+                    .font(.system(size: 14, weight: .semibold))
+                    .padding(.horizontal, 24)
+                    .padding(.vertical, 10)
+                    .background(Color.appGreen)
+                    .foregroundStyle(.white)
+                    .clipShape(Capsule())
+            }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .padding()
-    }
-}
-
-#Preview {
-    NavigationStack {
-        DepartmentListView(hospital: Hospital(
-            code: "NTU", name: "台大醫院", shortName: "台大",
-            city: "台北市", district: "中正區", level: "醫學中心", isActive: true
-        ))
     }
 }

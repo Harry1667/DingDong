@@ -1,4 +1,5 @@
 import SwiftUI
+import UIKit
 
 struct TrackingCardView: View {
     let task: TrackingTask
@@ -58,7 +59,6 @@ struct TrackingCardView: View {
 
                 Spacer()
 
-                // Active indicator dot
                 Circle()
                     .fill(isUrgent ? Color.appUrgency : Color.appGreenMid)
                     .frame(width: 8, height: 8)
@@ -76,12 +76,11 @@ struct TrackingCardView: View {
             .padding(.vertical, 14)
 
             // ── Progress bar ──
-            if let remaining = task.remaining, let userNumber = task.userNumber, userNumber > 0 {
+            if let _ = task.remaining, let userNumber = task.userNumber, userNumber > 0 {
                 let progress = Double(task.currentNumber) / Double(userNumber)
                 GeometryReader { geo in
                     ZStack(alignment: .leading) {
-                        Rectangle()
-                            .fill(Color.appBorder)
+                        Rectangle().fill(Color.appBorder)
                         Rectangle()
                             .fill(isUrgent ? Color.appUrgency : Color.appGreenMid)
                             .frame(width: geo.size.width * min(progress, 1.0))
@@ -90,17 +89,37 @@ struct TrackingCardView: View {
                 }
                 .frame(height: 3)
                 .clipShape(Rectangle())
-                .ignoresSafeArea(edges: [])
             }
         }
         .background(Color.appSurface)
         .clipShape(RoundedRectangle(cornerRadius: 20))
         .shadow(color: Color(red: 0.545, green: 0.431, blue: 0.314).opacity(0.10),
                 radius: 14, x: 0, y: 3)
+        .contextMenu {
+            Button(role: .destructive, action: onStop) {
+                Label("停止追蹤", systemImage: "bell.slash.fill")
+            }
+        }
         .onAppear { pulseOpacity = 0.5 }
+        .onChange(of: task.currentNumber) { _ in haptic(.light) }
+        .onChange(of: isUrgent) { urgent in
+            if urgent { haptic(.warning) }
+        }
     }
 
     @State private var pulseOpacity: Double = 1.0
+
+    private func haptic(_ style: HapticStyle) {
+        guard PersistenceService.shared.hapticEnabled else { return }
+        switch style {
+        case .light:
+            UIImpactFeedbackGenerator(style: .light).impactOccurred()
+        case .warning:
+            UINotificationFeedbackGenerator().notificationOccurred(.warning)
+        }
+    }
+
+    private enum HapticStyle { case light, warning }
 
     private func remainingText(_ remaining: Int) -> String {
         if remaining <= 0 { return "輪到您了！" }

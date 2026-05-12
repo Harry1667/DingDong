@@ -1,5 +1,6 @@
 import Foundation
 import UserNotifications
+import UIKit
 
 @MainActor
 final class NotificationService: ObservableObject {
@@ -7,12 +8,16 @@ final class NotificationService: ObservableObject {
     private init() {}
 
     @Published var isAuthorized = false
+    @Published var apnsToken: String?
 
     func requestAuthorization() async {
         do {
             let granted = try await UNUserNotificationCenter.current()
                 .requestAuthorization(options: [.alert, .sound, .badge])
             isAuthorized = granted
+            if granted {
+                UIApplication.shared.registerForRemoteNotifications()
+            }
         } catch {
             isAuthorized = false
         }
@@ -21,6 +26,9 @@ final class NotificationService: ObservableObject {
     func checkAuthorizationStatus() async {
         let settings = await UNUserNotificationCenter.current().notificationSettings()
         isAuthorized = settings.authorizationStatus == .authorized
+        if isAuthorized {
+            UIApplication.shared.registerForRemoteNotifications()
+        }
     }
 
     // MARK: - 發通知

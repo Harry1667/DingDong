@@ -17,10 +17,12 @@
 		1D19092BD2CBA0BA30EE76F0 /* Color+App.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E67FC69B6D4227F97DEC9C1 /* Color+App.swift */; };
 		229701DFF7C089E68981E3D8 /* View+Modifiers.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4B84451F2E25040BEC62415 /* View+Modifiers.swift */; };
 		2353B86E18744DBC207598B9 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D2A9DBBB5A332D648D53A77B /* Assets.xcassets */; };
+		34F71EC38CE759CDE58F827D /* StopFeedbackSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0B8F60EEA6E1F241194A892 /* StopFeedbackSheet.swift */; };
 		3BEFBEDD5999C60C694ABA48 /* TrackingWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3FC11CB931BA24BF7E1B12DE /* TrackingWidget.swift */; };
 		3F6E3AED07A5D2F5349329AB /* NetworkError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F6DD637326164791BE97FC8 /* NetworkError.swift */; };
 		424B8C7B06B89385F811EF02 /* Date+Format.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAC46440727540EE551EBFBF /* Date+Format.swift */; };
 		4533C90BECA4730B46577DCA /* DoctorProgressCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64140CE06EA3624430388F6C /* DoctorProgressCard.swift */; };
+		465296E3AC7530E628F3C950 /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B470972D9592DD02022AE88D /* OnboardingView.swift */; };
 		4A30F21818DF457E8DB95E57 /* Hospital.swift in Sources */ = {isa = PBXBuildFile; fileRef = C12E6606490CBBA463788A3E /* Hospital.swift */; };
 		4EADB90179F68A5ACD3056C3 /* HospitalListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B402005068A9B86B875AD40 /* HospitalListView.swift */; };
 		4EDB38DB4176EA72834B5D16 /* Date+Format.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAC46440727540EE551EBFBF /* Date+Format.swift */; };
@@ -112,11 +114,13 @@
 		A8E045F00E425736EE91FD40 /* SettingsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewModel.swift; sourceTree = "<group>"; };
 		AB3159CF9817B9F2D796E16D /* APIClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIClient.swift; sourceTree = "<group>"; };
 		B00DD0FD4633AE71127B76C1 /* HospitalViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HospitalViewModel.swift; sourceTree = "<group>"; };
+		B470972D9592DD02022AE88D /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
 		B4B84451F2E25040BEC62415 /* View+Modifiers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "View+Modifiers.swift"; sourceTree = "<group>"; };
 		B9C4B1289B4E72C151C0FD5A /* TrackingSetupView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackingSetupView.swift; sourceTree = "<group>"; };
 		BFC74B270C11F1CCD2C83CFE /* TrackingTask.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackingTask.swift; sourceTree = "<group>"; };
 		C02FACDE6E49EC17C1F66E97 /* TrackingWidgetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackingWidgetView.swift; sourceTree = "<group>"; };
 		C0649A827D0451A2AF769595 /* DingDongTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = DingDongTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		C0B8F60EEA6E1F241194A892 /* StopFeedbackSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StopFeedbackSheet.swift; sourceTree = "<group>"; };
 		C12E6606490CBBA463788A3E /* Hospital.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Hospital.swift; sourceTree = "<group>"; };
 		D2A9DBBB5A332D648D53A77B /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		D80A7DD95B61C69A496A963A /* PersistenceService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersistenceService.swift; sourceTree = "<group>"; };
@@ -165,6 +169,7 @@
 			children = (
 				8977C0668638980EE823CF2B /* HomeView.swift */,
 				EC6B3BDDB738C55C76BB904D /* HomeViewModel.swift */,
+				C0B8F60EEA6E1F241194A892 /* StopFeedbackSheet.swift */,
 				8DD000E1AB14808509716D4C /* TrackingCardView.swift */,
 			);
 			path = Home;
@@ -228,6 +233,7 @@
 			children = (
 				22584AD5D00DE054C30710AE /* Home */,
 				EE7AE4A18DD935C4A209F66F /* Hospital */,
+				C3358ACC4D6A41EC4527156E /* Onboarding */,
 				791E40AAA23327F90DDB601C /* Progress */,
 				CA6E7C6527F318206C8935C3 /* Settings */,
 				04695C87DC5AFF156AAAF2B5 /* Tracking */,
@@ -264,6 +270,14 @@
 				08BCD18054096EED732887C6 /* DingDong.entitlements */,
 			);
 			path = DingDong;
+			sourceTree = "<group>";
+		};
+		C3358ACC4D6A41EC4527156E /* Onboarding */ = {
+			isa = PBXGroup;
+			children = (
+				B470972D9592DD02022AE88D /* OnboardingView.swift */,
+			);
+			path = Onboarding;
 			sourceTree = "<group>";
 		};
 		C72F483D323F98189F160116 /* Services */ = {
@@ -453,10 +467,12 @@
 				D1933A3AE79B724D7DDEF7A1 /* HospitalViewModel.swift in Sources */,
 				3F6E3AED07A5D2F5349329AB /* NetworkError.swift in Sources */,
 				704AC4751259C50E2455033A /* NotificationService.swift in Sources */,
+				465296E3AC7530E628F3C950 /* OnboardingView.swift in Sources */,
 				035E34C0F3C34C6B01C03C0D /* PersistenceService.swift in Sources */,
 				D9C0762DD8A5C7522856BC07 /* ProgressViewModel.swift in Sources */,
 				5E283EB1E484B678099B24A5 /* SettingsView.swift in Sources */,
 				1CBF318A00E9EB7E5D13982A /* SettingsViewModel.swift in Sources */,
+				34F71EC38CE759CDE58F827D /* StopFeedbackSheet.swift in Sources */,
 				9266846490D8FE26ED5EAFF0 /* TrackingCardView.swift in Sources */,
 				8A91FE60AAC1AA55B25F3ACF /* TrackingDetailView.swift in Sources */,
 				78BAF58B65529DDD63CD03F6 /* TrackingService.swift in Sources */,

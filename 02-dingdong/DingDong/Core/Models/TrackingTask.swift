@@ -56,6 +56,7 @@ struct TrackStartRequest: Encodable {
     let clinicRoom: String
     let session: String?
     let userNumber: Int
+    let apnsToken: String?
 
     enum CodingKeys: String, CodingKey {
         case guestId      = "guest_id"
@@ -65,6 +66,7 @@ struct TrackStartRequest: Encodable {
         case clinicRoom   = "clinic_room"
         case session
         case userNumber   = "user_number"
+        case apnsToken    = "apns_token"
     }
 }
 

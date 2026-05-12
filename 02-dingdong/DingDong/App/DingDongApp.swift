@@ -30,9 +30,26 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
     }
 
     func applicationDidBecomeActive(_ application: UIApplication) {
-        Task {
-            await TrackingService.shared.refreshAllTasks()
+        Task { await TrackingService.shared.refreshAllTasks() }
+    }
+
+    func applicationDidEnterBackground(_ application: UIApplication) {
+        BackgroundService.shared.scheduleNextRefresh()
+    }
+
+    // MARK: - APNs
+
+    func application(_ application: UIApplication,
+                     didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
+        let token = deviceToken.map { String(format: "%02x", $0) }.joined()
+        Task { @MainActor in
+            NotificationService.shared.apnsToken = token
         }
+    }
+
+    func application(_ application: UIApplication,
+                     didFailToRegisterForRemoteNotificationsWithError error: Error) {
+        // Simulator 上預期會失敗，真機才有效
     }
 
     // 通知在前台也顯示
