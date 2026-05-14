@@ -8,6 +8,7 @@ struct HomeView: View {
 
     @State private var glowPulse = false
     @State private var feedbackTask: TrackingTask?
+    @State private var highlightedTaskId: UUID?
 
     init() {
         _vm = StateObject(wrappedValue: HomeViewModel(trackingService: TrackingService.shared))
@@ -77,41 +78,126 @@ struct HomeView: View {
     // MARK: - Task list
 
     private var taskList: some View {
-        ScrollView {
-            VStack(spacing: 20) {
-                let active = vm.tasks.filter { $0.status == .active }
-                if !active.isEmpty {
-                    VStack(spacing: 12) {
-                        ForEach(active) { task in
-                            TrackingCardView(task: task) {
-                                feedbackTask = task
+        ScrollViewReader { proxy in
+            ScrollView {
+                VStack(spacing: 20) {
+                    let active = vm.tasks.filter { $0.status == .active }
+                    if !active.isEmpty {
+                        VStack(spacing: 12) {
+                            ForEach(active) { task in
+                                TrackingCardView(task: task, onStop: { feedbackTask = task },
+                                                 isHighlighted: highlightedTaskId == task.id)
+                                    .id(task.id)
                             }
                         }
                     }
-                }
 
-                let scheduled = vm.tasks.filter { $0.status == .scheduled }
-                if !scheduled.isEmpty {
-                    VStack(alignment: .leading, spacing: 10) {
-                        Text("預約中")
-                            .font(.system(size: 12, weight: .semibold, design: .monospaced))
-                            .foregroundStyle(Color.appTextSecondary)
-                            .padding(.horizontal, 4)
-                        ForEach(scheduled) { task in
-                            scheduledCard(task: task)
+                    let scheduled = vm.tasks.filter { $0.status == .scheduled }
+                    if !scheduled.isEmpty {
+                        VStack(alignment: .leading, spacing: 10) {
+                            Text("預約中")
+                                .font(.system(size: 12, weight: .semibold, design: .monospaced))
+                                .foregroundStyle(Color.appTextSecondary)
+                                .padding(.horizontal, 4)
+                            ForEach(scheduled) { task in
+                                scheduledCard(task: task)
+                            }
                         }
                     }
-                }
 
-                if vm.tasks.count < TrackingService.maxTasks {
-                    addButton
+                    if vm.tasks.count < TrackingService.maxTasks {
+                        addButton
+                    }
+
+                    historySection
+                }
+                .padding(.horizontal, 20)
+                .padding(.top, 8)
+                .padding(.bottom, 32)
+            }
+            .refreshable { await trackingService.refreshAllTasks() }
+            .onChange(of: notificationService.pendingDeepLinkTaskId) { dbId in
+                handleDeepLink(dbId: dbId, proxy: proxy)
+            }
+            .onAppear {
+                handleDeepLink(dbId: notificationService.pendingDeepLinkTaskId, proxy: proxy)
+            }
+        }
+    }
+
+    private func handleDeepLink(dbId: Int?, proxy: ScrollViewProxy) {
+        guard let dbId else { return }
+        guard let task = trackingService.tasks.first(where: { $0.dbId == dbId }) else { return }
+        notificationService.pendingDeepLinkTaskId = nil
+        highlightedTaskId = task.id
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
+            withAnimation { proxy.scrollTo(task.id, anchor: .center) }
+        }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
+            highlightedTaskId = nil
+        }
+    }
+
+    // MARK: - History
+
+    @ViewBuilder
+    private var historySection: some View {
+        let history = PersistenceService.shared.trackingHistory.suffix(5).reversed() as [TrackingRecord]
+        if !history.isEmpty {
+            VStack(alignment: .leading, spacing: 10) {
+                Text("最近紀錄")
+                    .font(.system(size: 12, weight: .semibold, design: .monospaced))
+                    .foregroundStyle(Color.appTextSecondary)
+                    .padding(.horizontal, 4)
+                ForEach(history) { record in
+                    historyCard(record)
                 }
             }
-            .padding(.horizontal, 20)
-            .padding(.top, 8)
-            .padding(.bottom, 32)
         }
-        .refreshable { await trackingService.refreshAllTasks() }
+    }
+
+    private func historyCard(_ record: TrackingRecord) -> some View {
+        HStack(spacing: 12) {
+            VStack(alignment: .leading, spacing: 3) {
+                Text(record.doctorName)
+                    .font(.system(size: 14, weight: .semibold))
+                    .foregroundStyle(Color.appTextPrimary)
+                Text("\(record.hospitalName) · \(record.clinicRoom)")
+                    .font(.system(size: 11, design: .monospaced))
+                    .foregroundStyle(Color.appTextSecondary)
+            }
+            Spacer()
+            VStack(alignment: .trailing, spacing: 3) {
+                Text(historyReasonLabel(record.endReason))
+                    .font(.system(size: 11, weight: .medium))
+                    .foregroundStyle(historyReasonColor(record.endReason))
+                Text(record.date, style: .date)
+                    .font(.system(size: 10, design: .monospaced))
+                    .foregroundStyle(Color.appTextSecondary.opacity(0.7))
+            }
+        }
+        .padding(12)
+        .background(Color.appSurface.opacity(0.6))
+        .clipShape(RoundedRectangle(cornerRadius: 12))
+        .overlay(RoundedRectangle(cornerRadius: 12).stroke(Color.appBorder, lineWidth: 1))
+    }
+
+    private func historyReasonLabel(_ reason: String) -> String {
+        switch reason {
+        case "notified":  return "已叫號"
+        case "finished":  return "診已結束"
+        case "skipped":   return "已過號"
+        default:          return "已取消"
+        }
+    }
+
+    private func historyReasonColor(_ reason: String) -> Color {
+        switch reason {
+        case "notified": return Color.appGreen
+        case "finished": return Color.appTextSecondary
+        case "skipped":  return Color.appUrgency
+        default:         return Color.appTextSecondary.opacity(0.6)
+        }
     }
 
     // MARK: - Scheduled card

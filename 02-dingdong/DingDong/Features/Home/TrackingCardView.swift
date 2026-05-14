@@ -4,6 +4,7 @@ import UIKit
 struct TrackingCardView: View {
     let task: TrackingTask
     let onStop: () -> Void
+    var isHighlighted: Bool = false
 
     private var isUrgent: Bool {
         guard let remaining = task.remaining else { return false }
@@ -34,6 +35,11 @@ struct TrackingCardView: View {
                         .font(.system(size: 12, design: .monospaced))
                         .foregroundStyle(isUrgent ? Color.appUrgency : Color.appTextSecondary)
                         .animation(.easeInOut(duration: 0.5), value: remaining)
+                }
+                if let mins = task.estimatedMinutes {
+                    Text("約還需 \(mins) 分鐘")
+                        .font(.system(size: 11, design: .monospaced))
+                        .foregroundStyle(Color.appTextSecondary.opacity(0.75))
                 }
             }
             .frame(maxWidth: .infinity)
@@ -103,6 +109,11 @@ struct TrackingCardView: View {
         }
         .background(Color.appSurface)
         .clipShape(RoundedRectangle(cornerRadius: 20))
+        .overlay(
+            RoundedRectangle(cornerRadius: 20)
+                .stroke(Color.appGreen.opacity(isHighlighted ? 0.7 : 0), lineWidth: 2)
+                .animation(.easeInOut(duration: 0.4), value: isHighlighted)
+        )
         .shadow(color: Color(red: 0.545, green: 0.431, blue: 0.314).opacity(0.10),
                 radius: 14, x: 0, y: 3)
         .contextMenu {

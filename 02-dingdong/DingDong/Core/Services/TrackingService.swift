@@ -71,7 +71,9 @@ final class TrackingService: ObservableObject {
             status: isFuture ? .scheduled : .active
         )
 
-        tasks.append(task)
+        var newTask = task
+        newTask.numberHistory = [NumberSnapshot(number: progress.currentNumber, timestamp: Date())]
+        tasks.append(newTask)
         persist()
 
         guard !isFuture else { return }
@@ -112,6 +114,7 @@ final class TrackingService: ObservableObject {
         var task = tasks[idx]
 
         notifications.cancelNotifications(for: taskId)
+        saveRecord(task: task, reason: reason)
 
         if let dbId = task.dbId {
             Task.detached(priority: .background) {
@@ -187,6 +190,7 @@ final class TrackingService: ObservableObject {
                     print("[Tracking] \(task.doctorName) 看診時間內查無資料，標記結束")
                     tasks[i].status = .finished
                     tasks[i].lastUpdated = Date()
+                    saveRecord(task: tasks[i], reason: "finished")
                     notifications.sendFinished(task: tasks[i])
                     removeFinished(taskId: task.id)
                 }
@@ -202,6 +206,9 @@ final class TrackingService: ObservableObject {
             print("[Tracking] \(task.doctorName) 叫號更新: \(task.currentNumber) → \(newNumber)")
             tasks[i].currentNumber = newNumber
             tasks[i].lastUpdated = Date()
+            // 累積叫號快照（最多保留 10 筆）
+            tasks[i].numberHistory.append(NumberSnapshot(number: newNumber, timestamp: Date()))
+            if tasks[i].numberHistory.count > 10 { tasks[i].numberHistory.removeFirst() }
             evaluateNotification(taskIndex: i)
         }
 
@@ -227,6 +234,7 @@ final class TrackingService: ObservableObject {
         if cur == userNumber {
             task.status = .notified
             tasks[i] = task
+            saveRecord(task: task, reason: "notified")
             notifications.sendYourTurn(task: task)
             removeFinished(taskId: task.id)
             return
@@ -253,6 +261,23 @@ final class TrackingService: ObservableObject {
             self.tasks.removeAll { $0.id == taskId && $0.isFinished }
             self.persist()
         }
+    }
+
+    // MARK: - History
+
+    private func saveRecord(task: TrackingTask, reason: String) {
+        let record = TrackingRecord(
+            id: UUID(),
+            hospitalName: task.hospitalName,
+            doctorName: task.doctorName,
+            clinicRoom: task.clinicRoom,
+            date: Date(),
+            userNumber: task.userNumber,
+            finalNumber: task.currentNumber,
+            endReason: reason
+        )
+        persistence.appendHistory(record)
+        print("[Tracking] 歷史紀錄已儲存: \(task.doctorName) reason=\(reason)")
     }
 
     // MARK: - Timer

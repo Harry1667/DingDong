@@ -31,10 +31,7 @@ struct ContentView: View {
                 .environmentObject(notificationService)
             }
             .onChange(of: notificationService.pendingDeepLinkTaskId) { taskId in
-                if taskId != nil {
-                    selectedTab = 0
-                    notificationService.pendingDeepLinkTaskId = nil
-                }
+                if taskId != nil { selectedTab = 0 }
             }
 
             if showSplash {

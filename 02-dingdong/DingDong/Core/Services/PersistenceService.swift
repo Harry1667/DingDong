@@ -112,6 +112,26 @@ final class PersistenceService {
         favoriteDoctors = favoriteDoctors.filter { $0.id != id }
     }
 
+    // MARK: - Tracking History
+
+    var trackingHistory: [TrackingRecord] {
+        get {
+            guard let data = defaults.data(forKey: "tracking_history"),
+                  let records = try? JSONDecoder().decode([TrackingRecord].self, from: data) else { return [] }
+            return records
+        }
+        set {
+            let trimmed = Array(newValue.suffix(50))   // 最多保留 50 筆
+            defaults.set(try? JSONEncoder().encode(trimmed), forKey: "tracking_history")
+        }
+    }
+
+    func appendHistory(_ record: TrackingRecord) {
+        var history = trackingHistory
+        history.append(record)
+        trackingHistory = history
+    }
+
     // MARK: - Guest ID (Keychain)
 
     var guestId: String {

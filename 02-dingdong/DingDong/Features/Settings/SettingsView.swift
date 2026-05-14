@@ -113,6 +113,10 @@ struct SettingsView: View {
                             .foregroundStyle(Color.appTextPrimary)
                         LabeledContent("資料來源", value: "dd.dl-app.com")
                             .foregroundStyle(Color.appTextPrimary)
+                        NavigationLink(destination: PrivacyPolicyView()) {
+                            Text("隱私政策")
+                                .foregroundStyle(Color.appTextPrimary)
+                        }
                     }
                     .listRowBackground(Color.appSurface)
                 }
