@@ -21,6 +21,9 @@ private/
 01-dev/10-deploy-docs/
 01-dev/9-talk.md
 
+# === 後端獨立 repo（含 .env / .venv，且本身是 git repo，不該嵌進 iOS app）===
+api-dindon/
+
 # === Build 產物 ===
 node_modules/
 dist/
