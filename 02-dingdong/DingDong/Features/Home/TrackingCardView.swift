@@ -1,50 +1,50 @@
 import SwiftUI
 import UIKit
 
+/// 追蹤卡（左：醫院/科別/醫師；右：橘框大號碼）
+/// 對應 /simple 的 .lt-card 設計，有四種狀態色：active / loading / expired / passed / yours
 struct TrackingCardView: View {
     let task: TrackingTask
     let onStop: () -> Void
     var isHighlighted: Bool = false
 
     @EnvironmentObject private var favoriteService: FavoriteService
-    @State private var pulseOpacity: Double = 1.0
+
+    private var rightState: RightState {
+        // 未開診 / 超過 4 小時 → expired
+        if !TrackingService.isOperatingHours() { return .loading }
+        if let userNumber = task.userNumber {
+            if task.currentNumber > userNumber { return .passed }
+            if task.currentNumber == userNumber { return .yours }
+            return .active
+        }
+        return .loading
+    }
 
     private var isFav: Bool {
         favoriteService.isFavorite(hospitalCode: task.hospitalCode,
                                     doctorName: task.doctorName,
                                     clinicRoom: task.clinicRoom)
     }
-    private var isUrgent: Bool {
-        guard let remaining = task.remaining else { return false }
-        return remaining <= 3
-    }
-    private var accent: Color { isUrgent ? .appUrgency : .appGreen }
 
     var body: some View {
-        VStack(spacing: 0) {
-            cardHeader
-            Divider().padding(.horizontal, 18)
-            numberBlock
-            bottomBar
+        HStack(alignment: .center, spacing: 12) {
+            leftBlock
+            rightBlock
         }
-        .background(Color.appSurface)
-        .clipShape(RoundedRectangle(cornerRadius: 24))
-        .overlay(
-            RoundedRectangle(cornerRadius: 24)
-                .stroke(
-                    isHighlighted  ? Color.appGreen.opacity(0.65) :
-                    isUrgent       ? Color.appUrgency.opacity(0.40) :
-                                     Color.appBorder,
-                    lineWidth: isHighlighted || isUrgent ? 2 : 1
-                )
-                .animation(.easeInOut(duration: 0.35), value: isHighlighted)
-                .animation(.easeInOut(duration: 0.35), value: isUrgent)
+        .padding(14)
+        .simpleCard(
+            radius: 18,
+            background: cardBackground,
+            borderColor: cardBorder,
+            borderWidth: 2.5,
+            shadowDepth: 2
         )
-        .shadow(
-            color: isUrgent
-                ? Color.appUrgency.opacity(0.15)
-                : Color(red: 0.18, green: 0.42, blue: 0.31).opacity(0.10),
-            radius: isUrgent ? 22 : 18, x: 0, y: 6
+        .overlay(
+            RoundedRectangle(cornerRadius: 18)
+                .stroke(Color.appOk, lineWidth: isHighlighted ? 2 : 0)
+                .opacity(isHighlighted ? 1 : 0)
+                .animation(.easeInOut(duration: 0.35), value: isHighlighted)
         )
         .contextMenu {
             Button {
@@ -61,168 +61,159 @@ struct TrackingCardView: View {
                 Label("停止追蹤", systemImage: "bell.slash.fill")
             }
         }
-        .onAppear { pulseOpacity = 0.25 }
-        .onChange(of: task.currentNumber) { _ in haptic(.light) }
-        .onChange(of: isUrgent) { urgent in if urgent { haptic(.warning) } }
-    }
-
-    // MARK: ── Header ──────────────────────────────────────────
-
-    private var cardHeader: some View {
-        HStack(alignment: .center, spacing: 10) {
-            VStack(alignment: .leading, spacing: 5) {
-                Text(task.doctorName)
-                    .font(.system(size: 17, weight: .bold))
-                    .foregroundStyle(Color.appTextPrimary)
-                    .lineLimit(1)
-                Text("\(task.hospitalName)  ·  \(task.clinicRoom)")
-                    .font(.system(size: 12, design: .monospaced))
-                    .foregroundStyle(Color.appTextSecondary)
-                    .lineLimit(1)
-            }
-
-            Spacer(minLength: 8)
-
-            statusPill
-
-            Button {
-                favoriteService.toggle(
-                    hospitalCode: task.hospitalCode, hospitalName: task.hospitalName,
-                    department: task.department, doctorName: task.doctorName,
-                    clinicRoom: task.clinicRoom
-                )
-            } label: {
-                Image(systemName: isFav ? "star.fill" : "star")
-                    .font(.system(size: 15))
-                    .foregroundStyle(isFav ? Color.appGreen : Color.appTextSecondary.opacity(0.35))
-                    .frame(width: 24, height: 24)
-            }
-
-            Button(action: onStop) {
-                Image(systemName: "xmark.circle.fill")
-                    .font(.system(size: 18))
-                    .foregroundStyle(Color.appTextSecondary.opacity(0.28))
-                    .frame(width: 24, height: 24)
-            }
+        .onChange(of: task.currentNumber) { _ in
+            haptic(.light)
         }
-        .padding(.horizontal, 18)
-        .padding(.top, 16)
-        .padding(.bottom, 14)
-    }
-
-    private var statusPill: some View {
-        Group {
-            if !TrackingService.isOperatingHours() {
-                Label("休診", systemImage: "moon.zzz.fill")
-                    .font(.system(size: 10, weight: .semibold))
-                    .foregroundStyle(Color.appTextSecondary)
-                    .padding(.horizontal, 8).padding(.vertical, 4)
-                    .background(Color.appTextSecondary.opacity(0.09))
-                    .clipShape(Capsule())
-            } else {
-                HStack(spacing: 4) {
-                    Circle()
-                        .fill(accent)
-                        .frame(width: 6, height: 6)
-                        .opacity(pulseOpacity)
-                        .animation(
-                            .easeInOut(duration: 1.6).repeatForever(autoreverses: true),
-                            value: pulseOpacity
-                        )
-                    Text(isUrgent ? "快到了！" : "看診中")
-                        .font(.system(size: 10, weight: .semibold))
-                        .foregroundStyle(accent)
-                }
-                .padding(.horizontal, 8).padding(.vertical, 4)
-                .background(accent.opacity(0.10))
-                .clipShape(Capsule())
-            }
+        .onChange(of: rightState) { state in
+            if state == .yours || state == .passed { haptic(.warning) }
         }
     }
 
-    // MARK: ── Number block ────────────────────────────────────
+    // MARK: ── Left ──────────────────────────────────────────
 
-    private var numberBlock: some View {
-        VStack(spacing: 10) {
-            Text("目前叫號")
-                .font(.system(size: 11, weight: .semibold))
-                .tracking(3.5)
-                .foregroundStyle(isUrgent ? accent.opacity(0.85) : Color.appTextSecondary.opacity(0.55))
+    private var leftBlock: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            HStack(spacing: 6) {
+                SimpleLiveDot(color: rightState == .passed ? .appDanger : .appOk)
+                Text(rightState == .loading ? "上次追蹤" : "⟳ 目前追蹤")
+                    .font(.system(size: 14, weight: .heavy))
+                    .foregroundStyle(rightState == .loading ? Color.appInk3 : Color.appOk)
+            }
+            Text(task.hospitalName)
+                .font(.system(size: 20, weight: .heavy))
+                .tracking(-0.3)
+                .foregroundStyle(Color.appInk)
+                .lineLimit(1)
+            Text(detailLine)
+                .font(.system(size: 14, weight: .semibold))
+                .foregroundStyle(Color.appInkSoft)
+                .lineLimit(2)
+                .padding(.top, 1)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+    }
 
-            Text("\(task.currentNumber)")
-                .font(.system(size: 84, weight: .bold, design: .serif))
-                .foregroundStyle(isUrgent ? accent : Color.appTextPrimary)
+    private var detailLine: String {
+        var parts: [String] = []
+        if !task.department.isEmpty { parts.append(task.department) }
+        if !task.doctorName.isEmpty { parts.append(task.doctorName) }
+        if !task.clinicRoom.isEmpty { parts.append(task.clinicRoom) }
+        return parts.joined(separator: " · ")
+    }
+
+    // MARK: ── Right ─────────────────────────────────────────
+
+    private var rightBlock: some View {
+        VStack(spacing: 3) {
+            Text(rightTopLabel)
+                .font(.system(size: 12, weight: .heavy))
+                .tracking(0.5)
+                .foregroundStyle(rightDarkColor)
+            Text(rightTopValue)
+                .font(.system(size: 34, weight: .heavy))
+                .tracking(-1.5)
+                .foregroundStyle(rightColor)
+                .monospacedDigit()
                 .contentTransition(.numericText())
-                .animation(.spring(response: 0.4, dampingFraction: 0.75), value: task.currentNumber)
-                .padding(.top, -4)
-                .padding(.bottom, 2)
-
-            VStack(spacing: 5) {
-                if let remaining = task.remaining {
-                    Text(remainingText(remaining))
-                        .font(.system(size: 14, weight: .semibold, design: .monospaced))
-                        .foregroundStyle(isUrgent ? accent : Color.appTextSecondary)
-                        .animation(.easeInOut(duration: 0.3), value: remaining)
+                .animation(.spring(response: 0.4, dampingFraction: 0.75),
+                           value: rightTopValue)
+            Text("號")
+                .font(.system(size: 14, weight: .heavy))
+                .foregroundStyle(rightDarkColor)
+            if let userNumber = task.userNumber, rightState != .loading {
+                divider
+                    .padding(.vertical, 4)
+                HStack(spacing: 4) {
+                    Text("您是")
+                        .font(.system(size: 12, weight: .bold))
+                    Text("\(userNumber)")
+                        .font(.system(size: 16, weight: .heavy))
+                    Text("號")
+                        .font(.system(size: 12, weight: .bold))
                 }
-                if let mins = task.estimatedMinutes {
-                    Text("預估還需 \(mins) 分鐘")
-                        .font(.system(size: 11, design: .monospaced))
-                        .foregroundStyle(Color.appTextSecondary.opacity(0.55))
-                }
+                .foregroundStyle(rightDarkColor)
             }
+            Text(rightBottomText)
+                .font(.system(size: 12, weight: .bold))
+                .foregroundStyle(rightDarkColor)
+                .padding(.top, 2)
         }
-        .frame(maxWidth: .infinity)
-        .padding(.horizontal, 18)
-        .padding(.top, 26)
-        .padding(.bottom, 24)
+        .frame(minWidth: 116)
+        .padding(.vertical, 8).padding(.horizontal, 10)
+        .background(rightBackground)
+        .clipShape(RoundedRectangle(cornerRadius: 14))
+        .overlay(
+            RoundedRectangle(cornerRadius: 14)
+                .stroke(rightColor, lineWidth: 2)
+        )
     }
 
-    // MARK: ── Bottom bar ──────────────────────────────────────
+    private var divider: some View {
+        Rectangle()
+            .fill(rightDarkColor.opacity(0.25))
+            .frame(height: 1)
+            .frame(maxWidth: .infinity)
+            .padding(.horizontal, 2)
+    }
 
-    private var bottomBar: some View {
-        VStack(spacing: 0) {
-            if let userNumber = task.userNumber, userNumber > 0, task.remaining != nil {
-                let progress = min(Double(task.currentNumber) / Double(userNumber), 1.0)
+    // MARK: ── 狀態與配色 ──────────────────────────────────────
 
-                HStack {
-                    Text("更新 " + task.lastUpdated.relativeString)
-                        .font(.system(size: 10, design: .monospaced))
-                        .foregroundStyle(Color.appTextSecondary.opacity(0.45))
-                    Spacer()
-                    Text("掛號 #\(userNumber)")
-                        .font(.system(size: 10, weight: .semibold, design: .monospaced))
-                        .foregroundStyle(Color.appTextSecondary.opacity(0.45))
-                }
-                .padding(.horizontal, 18)
-                .padding(.top, 12)
-                .padding(.bottom, 10)
+    private enum RightState: Equatable { case active, yours, passed, loading }
 
-                GeometryReader { geo in
-                    ZStack(alignment: .leading) {
-                        Rectangle().fill(Color.appBorder.opacity(0.6))
-                        Rectangle()
-                            .fill(LinearGradient(
-                                colors: [accent.opacity(0.7), accent],
-                                startPoint: .leading, endPoint: .trailing
-                            ))
-                            .frame(width: geo.size.width * progress)
-                            .animation(.spring(response: 0.6, dampingFraction: 0.85), value: progress)
-                    }
-                }
-                .frame(height: 6)
-            } else {
-                Text("更新 " + task.lastUpdated.relativeString)
-                    .font(.system(size: 10, design: .monospaced))
-                    .foregroundStyle(Color.appTextSecondary.opacity(0.45))
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding(.horizontal, 18)
-                    .padding(.top, 12)
-                    .padding(.bottom, 14)
+    private var rightColor: Color {
+        switch rightState {
+        case .active:  return Color.appAccent
+        case .yours:   return Color(hex: "#04A256")
+        case .passed:  return Color.appDanger
+        case .loading: return Color.appInk2
+        }
+    }
+    private var rightDarkColor: Color {
+        switch rightState {
+        case .active:  return Color.appAccentD
+        case .yours:   return Color.appOkD2
+        case .passed:  return Color.appDangerD
+        case .loading: return Color.appInk3
+        }
+    }
+    private var rightBackground: Color {
+        switch rightState {
+        case .active:  return Color.appAccentS
+        case .yours:   return Color.appOkS
+        case .passed:  return Color.appDangerS
+        case .loading: return Color.appClosed
+        }
+    }
+    private var cardBackground: Color {
+        rightState == .loading ? Color.appCard : Color(hex: "#F0F7F3")
+    }
+    private var cardBorder: Color {
+        rightState == .loading ? Color.appBorder : Color.appOk
+    }
+    private var rightTopLabel: String {
+        rightState == .loading ? "您的號碼" : "目前看到"
+    }
+    private var rightTopValue: String {
+        if rightState == .loading {
+            return task.userNumber.map(String.init) ?? "—"
+        }
+        return "\(task.currentNumber)"
+    }
+    private var rightBottomText: String {
+        switch rightState {
+        case .passed:  return "已過號"
+        case .yours:   return "輪到您"
+        case .active:
+            if let userNumber = task.userNumber {
+                let rem = userNumber - task.currentNumber
+                return "還差 \(rem) 號"
             }
+            return "追蹤中…"
+        case .loading: return "追蹤中…"
         }
     }
 
-    // MARK: ── Haptic ──────────────────────────────────────────
+    // MARK: ── Haptic ────────────────────────────────────────
 
     private func haptic(_ style: HapticStyle) {
         guard PersistenceService.shared.hapticEnabled else { return }
@@ -233,10 +224,4 @@ struct TrackingCardView: View {
     }
 
     private enum HapticStyle { case light, warning }
-
-    private func remainingText(_ remaining: Int) -> String {
-        if remaining <= 0 { return "輪到您了！請準備就緒" }
-        if remaining == 1 { return "差 1 號，請準備好了" }
-        return "還差 \(remaining) 號輪到您"
-    }
 }

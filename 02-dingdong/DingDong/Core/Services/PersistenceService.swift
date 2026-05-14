@@ -112,6 +112,22 @@ final class PersistenceService {
         favoriteDoctors = favoriteDoctors.filter { $0.id != id }
     }
 
+    // MARK: - Pick Count（用於 hospital / dept / doctor 卡片上的「常選」星號）
+
+    private func pickKey(_ kind: String, scope: String, item: String? = nil) -> String {
+        let suffix = item.map { ":\($0)" } ?? ""
+        return "pick_\(kind):\(scope)\(suffix)"
+    }
+
+    func pickCount(kind: String, scope: String, item: String? = nil) -> Int {
+        defaults.integer(forKey: pickKey(kind, scope: scope, item: item))
+    }
+
+    func bumpPick(kind: String, scope: String, item: String? = nil) {
+        let key = pickKey(kind, scope: scope, item: item)
+        defaults.set(defaults.integer(forKey: key) + 1, forKey: key)
+    }
+
     // MARK: - Tracking History
 
     var trackingHistory: [TrackingRecord] {

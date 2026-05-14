@@ -9,20 +9,19 @@ struct ContentView: View {
 
     var body: some View {
         ZStack {
+            Color.appBg.ignoresSafeArea()
             TabView(selection: $selectedTab) {
                 HomeView()
                     .tabItem { Label("追蹤", systemImage: "bell.fill") }
                     .tag(0)
-
                 HistoryView()
                     .tabItem { Label("我的紀錄", systemImage: "clock.arrow.circlepath") }
                     .tag(1)
-
                 SettingsView()
                     .tabItem { Label("設定", systemImage: "gearshape.fill") }
                     .tag(2)
             }
-            .tint(Color.appGreen)
+            .tint(Color.appAccent)
             .fullScreenCover(isPresented: $showOnboarding) {
                 OnboardingView {
                     PersistenceService.shared.onboardingDone = true
@@ -41,12 +40,22 @@ struct ContentView: View {
             }
         }
         .onAppear {
-            DispatchQueue.main.asyncAfter(deadline: .now() + 1.6) {
+            applyTabBarAppearance()
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1.4) {
                 withAnimation(.easeOut(duration: 0.45)) {
                     showSplash = false
                 }
             }
         }
+    }
+
+    private func applyTabBarAppearance() {
+        let appearance = UITabBarAppearance()
+        appearance.configureWithOpaqueBackground()
+        appearance.backgroundColor = UIColor(Color.appBg)
+        appearance.shadowColor = UIColor(Color.appBorder)
+        UITabBar.appearance().standardAppearance = appearance
+        UITabBar.appearance().scrollEdgeAppearance = appearance
     }
 }
 
@@ -56,7 +65,7 @@ private struct SplashView: View {
 
     var body: some View {
         ZStack {
-            Color(UIColor.systemBackground).ignoresSafeArea()
+            Color.appBg.ignoresSafeArea()
             Image("AppLogo")
                 .resizable()
                 .scaledToFit()

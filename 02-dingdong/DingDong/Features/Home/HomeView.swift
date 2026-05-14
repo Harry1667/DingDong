@@ -7,13 +7,12 @@ struct HomeView: View {
     @StateObject private var vm: HomeViewModel
     @Environment(\.scenePhase) private var scenePhase
 
-    @State private var glowPulse        = false
     @State private var feedbackTask: TrackingTask?
     @State private var highlightedTaskId: UUID?
     @State private var quickTrackItem: QuickTrackItem?
     @State private var loadingFavoriteId: UUID?
     @State private var noDataDoctorName: String?
-    @State private var showAddFavorite  = false
+    @State private var showAddFavorite = false
 
     init() {
         _vm = StateObject(wrappedValue: HomeViewModel(trackingService: TrackingService.shared))
@@ -22,12 +21,29 @@ struct HomeView: View {
     var body: some View {
         NavigationStack {
             ZStack {
-                Color.appBackground.ignoresSafeArea()
-                ambientGlow
-                mainScroll
+                Color.appBg.ignoresSafeArea()
+                ScrollViewReader { proxy in
+                    ScrollView {
+                        VStack(spacing: 14) {
+                            header
+                            trackingSection
+                            favoritesSection
+                                .padding(.top, 6)
+                        }
+                        .padding(.horizontal, 16)
+                        .padding(.top, 8)
+                        .padding(.bottom, 32)
+                    }
+                    .refreshable { await trackingService.refreshAllTasks() }
+                    .onChange(of: notificationService.pendingDeepLinkTaskId) { dbId in
+                        handleDeepLink(dbId: dbId, proxy: proxy)
+                    }
+                    .onAppear {
+                        handleDeepLink(dbId: notificationService.pendingDeepLinkTaskId, proxy: proxy)
+                    }
+                }
             }
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar { navBar }
+            .navigationBarHidden(true)
         }
         .sheet(item: $feedbackTask) { task in
             StopFeedbackSheet(task: task) { reason in
@@ -54,190 +70,176 @@ struct HomeView: View {
                 await notificationService.requestAuthorization()
             }
         }
-        .onAppear {
-            withAnimation(.easeInOut(duration: 7).repeatForever(autoreverses: true)) {
-                glowPulse = true
-            }
-        }
         .onChange(of: scenePhase) { phase in
             switch phase {
             case .active:
                 Task { await trackingService.refreshAllTasks() }
             case .background:
                 BackgroundService.shared.scheduleNextRefresh()
-            default:
-                break
+            default: break
             }
         }
     }
 
-    // MARK: ── Navigation bar ─────────────────────────────────
+    // MARK: ── Header ─────────────────────────────────────────
 
-    @ToolbarContentBuilder
-    private var navBar: some ToolbarContent {
-        ToolbarItem(placement: .principal) {
-            HStack(spacing: 8) {
+    private var header: some View {
+        HStack {
+            HStack(spacing: 10) {
                 Image("AppIconNav")
                     .resizable().scaledToFit()
-                    .frame(width: 26, height: 26)
+                    .frame(width: 30, height: 30)
                 Text("叮咚到號")
-                    .font(.system(size: 17, weight: .semibold))
-                    .foregroundStyle(Color.appTextPrimary)
+                    .font(.system(size: 20, weight: .heavy))
+                    .tracking(1)
+                    .foregroundStyle(Color.appInk)
             }
-        }
-        if !vm.tasks.isEmpty {
-            ToolbarItem(placement: .topBarTrailing) {
+            Spacer()
+            if !vm.tasks.isEmpty {
                 Button {
                     Task { await trackingService.refreshAllTasks() }
                 } label: {
                     Image(systemName: "arrow.clockwise")
-                        .font(.system(size: 14, weight: .semibold))
-                        .foregroundStyle(Color.appGreen)
+                        .font(.system(size: 14, weight: .heavy))
+                        .foregroundStyle(Color.appAccentD)
+                        .frame(width: 40, height: 40)
+                        .background(Color.appAccentS)
+                        .clipShape(Circle())
+                        .overlay(Circle().stroke(Color.appAccent, lineWidth: 2))
                 }
             }
         }
-    }
-
-    // MARK: ── Main scroll ────────────────────────────────────
-
-    private var mainScroll: some View {
-        ScrollViewReader { proxy in
-            ScrollView {
-                VStack(spacing: 0) {
-                    // 追蹤中
-                    trackingSection
-                        .padding(.horizontal, 20)
-                        .padding(.top, 16)
-                        .padding(.bottom, 32)
-
-                    sectionDivider
-
-                    // 常用醫師
-                    favoritesSection
-                        .padding(.horizontal, 20)
-                        .padding(.top, 32)
-                        .padding(.bottom, 44)
-                }
-            }
-            .refreshable { await trackingService.refreshAllTasks() }
-            .onChange(of: notificationService.pendingDeepLinkTaskId) { dbId in
-                handleDeepLink(dbId: dbId, proxy: proxy)
-            }
-            .onAppear {
-                handleDeepLink(dbId: notificationService.pendingDeepLinkTaskId, proxy: proxy)
-            }
-        }
-    }
-
-    private var sectionDivider: some View {
-        HStack(spacing: 12) {
-            Rectangle()
-                .fill(Color.appBorder)
-                .frame(height: 1)
-        }
-        .padding(.horizontal, 20)
     }
 
     // MARK: ── 追蹤中 ─────────────────────────────────────────
 
     private var trackingSection: some View {
-        VStack(alignment: .leading, spacing: 16) {
+        VStack(alignment: .leading, spacing: 12) {
             let active    = vm.tasks.filter { $0.status == .active }
             let scheduled = vm.tasks.filter { $0.status == .scheduled }
             let total     = active.count + scheduled.count
 
-            // Section header
-            HStack(alignment: .center) {
-                Label {
-                    Text("追蹤中")
-                        .font(.system(size: 11, weight: .heavy))
-                        .tracking(1.5)
-                } icon: {
-                    Image(systemName: "bell.fill")
-                        .font(.system(size: 10))
-                }
-                .foregroundStyle(Color.appTextSecondary)
-
+            HStack(spacing: 8) {
+                Text("我的追蹤")
+                    .font(.system(size: 22, weight: .heavy))
+                    .tracking(-0.3)
+                    .foregroundStyle(Color.appInk)
                 if total > 0 {
-                    Text("\(total)")
-                        .font(.system(size: 10, weight: .bold, design: .monospaced))
-                        .padding(.horizontal, 6).padding(.vertical, 2)
-                        .background(Color.appGreen.opacity(0.12))
-                        .foregroundStyle(Color.appGreen)
+                    Text("\(total) / \(TrackingService.maxTasks)")
+                        .font(.system(size: 13, weight: .heavy, design: .monospaced))
+                        .foregroundStyle(Color.appAccentD)
+                        .padding(.horizontal, 8).padding(.vertical, 3)
+                        .background(Color.appAccentS)
                         .clipShape(Capsule())
+                        .overlay(Capsule().stroke(Color.appAccent, lineWidth: 1.5))
                 }
+                Spacer()
             }
 
-            // Content
             if active.isEmpty && scheduled.isEmpty {
-                trackingEmptyState
+                addTrackingCTA(isFirst: true)
             } else {
-                VStack(spacing: 14) {
+                VStack(spacing: 10) {
                     ForEach(active) { task in
-                        TrackingCardView(
-                            task: task,
-                            onStop: { feedbackTask = task },
-                            isHighlighted: highlightedTaskId == task.id
-                        )
+                        NavigationLink(destination: TrackingDetailView(taskId: task.id)) {
+                            TrackingCardView(
+                                task: task,
+                                onStop: { feedbackTask = task },
+                                isHighlighted: highlightedTaskId == task.id
+                            )
+                        }
+                        .buttonStyle(.plain)
                         .id(task.id)
                     }
-                }
-
-                if !scheduled.isEmpty {
-                    if !active.isEmpty {
-                        sectionSubheader("預約中", icon: "clock")
-                            .padding(.top, 6)
-                    }
-                    VStack(spacing: 10) {
-                        ForEach(scheduled) { task in
-                            scheduledCard(task)
-                        }
+                    ForEach(scheduled) { task in
+                        scheduledCard(task)
                     }
                 }
-
                 if vm.tasks.count < TrackingService.maxTasks {
-                    addTrackingButton
+                    addTrackingCTA(isFirst: false)
                         .padding(.top, 4)
                 }
             }
         }
     }
 
-    private var trackingEmptyState: some View {
-        VStack(spacing: 16) {
-            VStack(spacing: 6) {
-                Image(systemName: "bell.slash")
-                    .font(.system(size: 32))
-                    .foregroundStyle(Color.appGreen.opacity(0.25))
-                Text("目前無追蹤任務")
-                    .font(.system(size: 14, weight: .semibold))
-                    .foregroundStyle(Color.appTextSecondary)
-                Text("選擇醫院與掛號號碼，輪到您時立即通知")
-                    .font(.system(size: 12, design: .monospaced))
-                    .foregroundStyle(Color.appTextSecondary.opacity(0.6))
-                    .multilineTextAlignment(.center)
+    private func addTrackingCTA(isFirst: Bool) -> some View {
+        NavigationLink(destination: HospitalListView()) {
+            HStack(spacing: 14) {
+                Image(systemName: "plus.circle.fill")
+                    .font(.system(size: 26, weight: .heavy))
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(isFirst ? "新增追蹤" : "再追一位")
+                        .font(.system(size: 20, weight: .heavy))
+                        .tracking(1)
+                    Text("選擇醫院、科別與醫師")
+                        .font(.system(size: 13, weight: .semibold))
+                        .opacity(0.92)
+                }
+                Spacer()
             }
-            .frame(maxWidth: .infinity)
-            .padding(.vertical, 20)
-
-            addTrackingButton
+            .padding(.horizontal, 18).padding(.vertical, 16)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .foregroundStyle(.white)
+            .background(
+                LinearGradient(
+                    colors: [Color.appAccent, Color.appAccentD],
+                    startPoint: .top, endPoint: .bottom
+                )
+            )
+            .clipShape(RoundedRectangle(cornerRadius: 18))
+            .shadow(color: Color.appAccentDD.opacity(0.95), radius: 0, x: 0, y: 4)
         }
+        .buttonStyle(.plain)
     }
 
-    private var addTrackingButton: some View {
-        NavigationLink(destination: HospitalListView()) {
-            HStack(spacing: 7) {
-                Image(systemName: "plus.circle.fill")
-                    .font(.system(size: 15))
-                Text("新增追蹤")
-                    .font(.system(size: 14, weight: .semibold))
+    private func scheduledCard(_ task: TrackingTask) -> some View {
+        HStack(spacing: 12) {
+            VStack(alignment: .leading, spacing: 3) {
+                Text(task.doctorName)
+                    .font(.system(size: 18, weight: .heavy))
+                    .foregroundStyle(Color.appInk)
+                Text("\(task.hospitalName) · \(task.clinicRoom)")
+                    .font(.system(size: 13, weight: .semibold))
+                    .foregroundStyle(Color.appInkSoft)
             }
-            .frame(maxWidth: .infinity)
-            .padding(.vertical, 13)
-            .background(Color.appGreenLight)
-            .foregroundStyle(Color.appGreen)
-            .clipShape(RoundedRectangle(cornerRadius: 14))
+            Spacer()
+            VStack(alignment: .trailing, spacing: 3) {
+                if let date = task.scheduledDate {
+                    Text(date, style: .date)
+                        .font(.system(size: 13, weight: .heavy, design: .monospaced))
+                        .foregroundStyle(Color.appAccentD)
+                }
+                Text("等待開診")
+                    .font(.system(size: 11, weight: .bold))
+                    .foregroundStyle(Color.appInkSoft)
+            }
+            let isFav = favoriteService.isFavorite(
+                hospitalCode: task.hospitalCode,
+                doctorName: task.doctorName,
+                clinicRoom: task.clinicRoom
+            )
+            Button {
+                favoriteService.toggle(
+                    hospitalCode: task.hospitalCode, hospitalName: task.hospitalName,
+                    department: task.department, doctorName: task.doctorName,
+                    clinicRoom: task.clinicRoom
+                )
+            } label: {
+                Image(systemName: isFav ? "star.fill" : "star")
+                    .font(.system(size: 17))
+                    .foregroundStyle(isFav ? Color.appAccent : Color.appInk3)
+            }
+            Button {
+                trackingService.stopTracking(taskId: task.id, reason: "cancelled")
+            } label: {
+                Image(systemName: "xmark.circle.fill")
+                    .font(.system(size: 22))
+                    .foregroundStyle(Color.appInk3.opacity(0.5))
+            }
         }
+        .padding(14)
+        .simpleCard(radius: 16)
     }
 
     private func handleDeepLink(dbId: Int?, proxy: ScrollViewProxy) {
@@ -253,48 +255,37 @@ struct HomeView: View {
         }
     }
 
-    // MARK: ── 常用醫師 ────────────────────────────────────────
+    // MARK: ── 常用醫師 ──────────────────────────────────────
 
     private var favoritesSection: some View {
-        VStack(alignment: .leading, spacing: 14) {
-            // Section header + add button
-            HStack(alignment: .center) {
-                Label {
-                    Text("常用醫師")
-                        .font(.system(size: 11, weight: .heavy))
-                        .tracking(1.5)
-                } icon: {
-                    Image(systemName: "star.fill")
-                        .font(.system(size: 10))
-                }
-                .foregroundStyle(Color.appTextSecondary)
-
+        VStack(alignment: .leading, spacing: 10) {
+            HStack(spacing: 8) {
+                Text("常用醫師")
+                    .font(.system(size: 20, weight: .heavy))
+                    .tracking(-0.3)
+                    .foregroundStyle(Color.appInk)
                 if !favoriteService.favorites.isEmpty {
                     Text("\(favoriteService.favorites.count)")
-                        .font(.system(size: 10, weight: .bold, design: .monospaced))
-                        .padding(.horizontal, 6).padding(.vertical, 2)
-                        .background(Color.appGreen.opacity(0.12))
-                        .foregroundStyle(Color.appGreen)
+                        .font(.system(size: 12, weight: .heavy, design: .monospaced))
+                        .foregroundStyle(Color.appAccentD)
+                        .padding(.horizontal, 7).padding(.vertical, 2)
+                        .background(Color.appAccentS)
                         .clipShape(Capsule())
+                        .overlay(Capsule().stroke(Color.appAccent, lineWidth: 1.5))
                 }
-
                 Spacer()
-
                 Button { showAddFavorite = true } label: {
                     HStack(spacing: 4) {
-                        Image(systemName: "plus")
-                            .font(.system(size: 11, weight: .bold))
-                        Text("新增")
-                            .font(.system(size: 12, weight: .semibold))
+                        Image(systemName: "plus").font(.system(size: 12, weight: .heavy))
+                        Text("新增").font(.system(size: 13, weight: .heavy))
                     }
-                    .padding(.horizontal, 10).padding(.vertical, 5)
-                    .background(Color.appGreenLight)
-                    .foregroundStyle(Color.appGreen)
+                    .padding(.horizontal, 12).padding(.vertical, 6)
+                    .foregroundStyle(.white)
+                    .background(Color.appInk)
                     .clipShape(Capsule())
                 }
             }
 
-            // Content
             if favoriteService.favorites.isEmpty {
                 favoritesEmptyState
             } else {
@@ -310,76 +301,72 @@ struct HomeView: View {
     private var favoritesEmptyState: some View {
         Button { showAddFavorite = true } label: {
             HStack(spacing: 14) {
-                Image(systemName: "star.circle")
-                    .font(.system(size: 28))
-                    .foregroundStyle(Color.appGreen.opacity(0.40))
-
-                VStack(alignment: .leading, spacing: 3) {
+                Image(systemName: "star.circle.fill")
+                    .font(.system(size: 30))
+                    .foregroundStyle(Color.appAccent.opacity(0.55))
+                VStack(alignment: .leading, spacing: 2) {
                     Text("加入常用醫師")
-                        .font(.system(size: 14, weight: .semibold))
-                        .foregroundStyle(Color.appTextPrimary)
+                        .font(.system(size: 16, weight: .heavy))
+                        .foregroundStyle(Color.appInk)
                     Text("下次直接快速追蹤，省去三層選擇")
-                        .font(.system(size: 12, design: .monospaced))
-                        .foregroundStyle(Color.appTextSecondary.opacity(0.7))
+                        .font(.system(size: 13, weight: .semibold))
+                        .foregroundStyle(Color.appInkSoft)
                 }
-
                 Spacer()
-
                 Image(systemName: "chevron.right")
-                    .font(.system(size: 12, weight: .semibold))
-                    .foregroundStyle(Color.appGreen.opacity(0.5))
+                    .font(.system(size: 14, weight: .heavy))
+                    .foregroundStyle(Color.appAccentD.opacity(0.6))
             }
             .padding(16)
-            .background(Color.appSurface)
-            .clipShape(RoundedRectangle(cornerRadius: 16))
+            .background(Color.appCardWarm)
+            .clipShape(RoundedRectangle(cornerRadius: 18))
             .overlay(
-                RoundedRectangle(cornerRadius: 16)
+                RoundedRectangle(cornerRadius: 18)
                     .strokeBorder(
-                        Color.appGreen.opacity(0.20),
-                        style: StrokeStyle(lineWidth: 1.5, dash: [6, 4])
+                        Color.appAccent.opacity(0.55),
+                        style: StrokeStyle(lineWidth: 2, dash: [6, 4])
                     )
             )
         }
+        .buttonStyle(.plain)
     }
 
     private func favoriteCard(_ fav: FavoriteDoctor) -> some View {
-        HStack(spacing: 14) {
-            VStack(alignment: .leading, spacing: 4) {
+        HStack(spacing: 12) {
+            VStack(alignment: .leading, spacing: 3) {
                 Text(fav.doctorName)
-                    .font(.system(size: 15, weight: .semibold))
-                    .foregroundStyle(Color.appTextPrimary)
-                Text("\(fav.hospitalName)  ·  \(fav.clinicRoom)")
-                    .font(.system(size: 12, design: .monospaced))
-                    .foregroundStyle(Color.appTextSecondary)
+                    .font(.system(size: 17, weight: .heavy))
+                    .foregroundStyle(Color.appInk)
+                Text("\(fav.hospitalName) · \(fav.clinicRoom)")
+                    .font(.system(size: 13, weight: .semibold))
+                    .foregroundStyle(Color.appInkSoft)
             }
             Spacer()
             Button { Task { await quickTrack(fav) } } label: {
                 Group {
                     if loadingFavoriteId == fav.id {
-                        ProgressView().tint(Color.appGreen)
+                        ProgressView().tint(.white)
                     } else {
                         Text("快速追蹤")
-                            .font(.system(size: 12, weight: .semibold))
+                            .font(.system(size: 13, weight: .heavy))
                     }
                 }
-                .frame(width: 64, height: 16)
-                .padding(.horizontal, 12).padding(.vertical, 7)
-                .background(Color.appGreenLight)
-                .foregroundStyle(Color.appGreen)
+                .frame(width: 72, height: 36)
+                .foregroundStyle(.white)
+                .background(Color.appAccent)
                 .clipShape(Capsule())
+                .shadow(color: Color.appAccentD, radius: 0, x: 0, y: 2)
             }
+            .buttonStyle(.plain)
             .disabled(loadingFavoriteId == fav.id)
             Button { favoriteService.remove(fav) } label: {
                 Image(systemName: "star.slash")
-                    .font(.system(size: 14))
-                    .foregroundStyle(Color.appTextSecondary.opacity(0.30))
+                    .font(.system(size: 16))
+                    .foregroundStyle(Color.appInk3.opacity(0.5))
             }
         }
-        .padding(.horizontal, 14)
-        .padding(.vertical, 13)
-        .background(Color.appSurface)
-        .clipShape(RoundedRectangle(cornerRadius: 14))
-        .overlay(RoundedRectangle(cornerRadius: 14).stroke(Color.appBorder, lineWidth: 1))
+        .padding(14)
+        .simpleCard(radius: 16)
     }
 
     private func quickTrack(_ fav: FavoriteDoctor) async {
@@ -399,93 +386,6 @@ struct HomeView: View {
             hospital: Hospital(code: fav.hospitalCode, name: fav.hospitalName),
             progress: match
         )
-    }
-
-    // MARK: ── Scheduled card ─────────────────────────────────
-
-    private func scheduledCard(_ task: TrackingTask) -> some View {
-        HStack(spacing: 14) {
-            VStack(alignment: .leading, spacing: 4) {
-                Text(task.doctorName)
-                    .font(.system(size: 15, weight: .semibold))
-                    .foregroundStyle(Color.appTextPrimary)
-                Text("\(task.hospitalName)  ·  \(task.clinicRoom)")
-                    .font(.system(size: 12, design: .monospaced))
-                    .foregroundStyle(Color.appTextSecondary)
-            }
-            Spacer()
-            VStack(alignment: .trailing, spacing: 3) {
-                if let date = task.scheduledDate {
-                    Text(date, style: .date)
-                        .font(.system(size: 12, weight: .semibold, design: .monospaced))
-                        .foregroundStyle(Color.appGreen)
-                }
-                Text("等待開診")
-                    .font(.system(size: 10, design: .monospaced))
-                    .foregroundStyle(Color.appTextSecondary)
-            }
-
-            let isFav = favoriteService.isFavorite(
-                hospitalCode: task.hospitalCode,
-                doctorName: task.doctorName,
-                clinicRoom: task.clinicRoom
-            )
-            Button {
-                favoriteService.toggle(
-                    hospitalCode: task.hospitalCode, hospitalName: task.hospitalName,
-                    department: task.department, doctorName: task.doctorName,
-                    clinicRoom: task.clinicRoom
-                )
-            } label: {
-                Image(systemName: isFav ? "star.fill" : "star")
-                    .font(.system(size: 15))
-                    .foregroundStyle(isFav ? Color.appGreen : Color.appTextSecondary.opacity(0.30))
-            }
-
-            Button {
-                trackingService.stopTracking(taskId: task.id, reason: "cancelled")
-            } label: {
-                Image(systemName: "xmark.circle.fill")
-                    .font(.system(size: 18))
-                    .foregroundStyle(Color.appTextSecondary.opacity(0.30))
-            }
-        }
-        .padding(.horizontal, 14)
-        .padding(.vertical, 13)
-        .background(Color.appSurface)
-        .clipShape(RoundedRectangle(cornerRadius: 14))
-        .overlay(RoundedRectangle(cornerRadius: 14).stroke(Color.appBorder, lineWidth: 1))
-    }
-
-    // MARK: ── Helpers ─────────────────────────────────────────
-
-    private func sectionSubheader(_ title: String, icon: String) -> some View {
-        Label(title, systemImage: icon)
-            .font(.system(size: 11, weight: .semibold, design: .monospaced))
-            .foregroundStyle(Color.appTextSecondary.opacity(0.7))
-    }
-
-    // MARK: ── Ambient glow ────────────────────────────────────
-
-    private var ambientGlow: some View {
-        GeometryReader { geo in
-            ZStack {
-                Circle()
-                    .fill(Color.appGreen.opacity(0.04))
-                    .frame(width: geo.size.width * 0.8)
-                    .blur(radius: 90)
-                    .offset(x: -geo.size.width * 0.2, y: -geo.size.height * 0.08)
-                    .scaleEffect(glowPulse ? 1.10 : 0.90)
-                Circle()
-                    .fill(Color.appGreenMid.opacity(0.03))
-                    .frame(width: geo.size.width * 0.65)
-                    .blur(radius: 80)
-                    .offset(x: geo.size.width * 0.35, y: geo.size.height * 0.55)
-                    .scaleEffect(glowPulse ? 0.90 : 1.10)
-            }
-        }
-        .ignoresSafeArea()
-        .allowsHitTesting(false)
     }
 }
 

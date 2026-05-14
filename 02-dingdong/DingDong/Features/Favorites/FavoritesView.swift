@@ -6,112 +6,129 @@ struct HistoryView: View {
     var body: some View {
         NavigationStack {
             ZStack {
-                Color.appBackground.ignoresSafeArea()
-                if records.isEmpty {
-                    emptyState
-                } else {
-                    recordList
+                Color.appBg.ignoresSafeArea()
+                VStack(spacing: 0) {
+                    header
+                    if records.isEmpty {
+                        emptyState
+                    } else {
+                        recordList
+                    }
                 }
             }
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .principal) {
-                    Text("我的看診紀錄")
-                        .font(.system(size: 17, weight: .semibold))
-                        .foregroundStyle(Color.appTextPrimary)
-                }
-            }
+            .navigationBarHidden(true)
         }
         .onAppear { loadRecords() }
+    }
+
+    private var header: some View {
+        VStack(spacing: 4) {
+            HStack {
+                Spacer()
+                Text("叮咚到號")
+                    .font(.system(size: 18, weight: .heavy))
+                    .tracking(1)
+                    .foregroundStyle(Color.appInk)
+                Spacer()
+            }
+            .frame(height: 44)
+            Text("我的看診紀錄")
+                .font(.system(size: 22, weight: .heavy))
+                .tracking(-0.3)
+                .foregroundStyle(Color.appInk)
+                .frame(maxWidth: .infinity, alignment: .leading)
+        }
+        .padding(.horizontal, 16)
+        .padding(.top, 10)
+        .padding(.bottom, 8)
     }
 
     private func loadRecords() {
         records = PersistenceService.shared.trackingHistory.reversed()
     }
 
-    // MARK: - List
-
     private var recordList: some View {
         ScrollView {
-            VStack(spacing: 12) {
+            VStack(spacing: 10) {
                 ForEach(records) { record in
                     recordCard(record)
                 }
             }
-            .padding(.horizontal, 20)
-            .padding(.top, 8)
+            .padding(.horizontal, 16)
+            .padding(.top, 4)
             .padding(.bottom, 32)
         }
     }
 
     private func recordCard(_ record: TrackingRecord) -> some View {
-        HStack(spacing: 14) {
-            VStack(alignment: .leading, spacing: 5) {
+        HStack(spacing: 12) {
+            VStack(alignment: .leading, spacing: 4) {
                 Text(record.doctorName)
-                    .font(.system(size: 15, weight: .semibold))
-                    .foregroundStyle(Color.appTextPrimary)
+                    .font(.system(size: 17, weight: .heavy))
+                    .foregroundStyle(Color.appInk)
                 Text("\(record.hospitalName) · \(record.clinicRoom)")
-                    .font(.system(size: 12, design: .monospaced))
-                    .foregroundStyle(Color.appTextSecondary)
+                    .font(.system(size: 13, weight: .semibold))
+                    .foregroundStyle(Color.appInkSoft)
                 Text(record.date, style: .date)
-                    .font(.system(size: 11, design: .monospaced))
-                    .foregroundStyle(Color.appTextSecondary.opacity(0.6))
+                    .font(.system(size: 12, weight: .semibold, design: .monospaced))
+                    .foregroundStyle(Color.appInk3)
             }
             Spacer()
             VStack(alignment: .trailing, spacing: 6) {
                 Text(reasonLabel(record.endReason))
-                    .font(.system(size: 11, weight: .semibold))
-                    .padding(.horizontal, 9)
-                    .padding(.vertical, 4)
-                    .background(reasonColor(record.endReason).opacity(0.12))
+                    .font(.system(size: 12, weight: .heavy))
+                    .padding(.horizontal, 10).padding(.vertical, 4)
+                    .background(reasonColor(record.endReason).opacity(0.15))
                     .foregroundStyle(reasonColor(record.endReason))
                     .clipShape(Capsule())
+                    .overlay(
+                        Capsule().stroke(reasonColor(record.endReason).opacity(0.5), lineWidth: 1.5)
+                    )
                 if let userNumber = record.userNumber {
                     Text("掛號 #\(userNumber)")
-                        .font(.system(size: 11, design: .monospaced))
-                        .foregroundStyle(Color.appTextSecondary.opacity(0.6))
+                        .font(.system(size: 12, weight: .semibold, design: .monospaced))
+                        .foregroundStyle(Color.appInk3)
                 }
             }
         }
         .padding(14)
-        .background(Color.appSurface)
-        .clipShape(RoundedRectangle(cornerRadius: 14))
-        .overlay(RoundedRectangle(cornerRadius: 14).stroke(Color.appBorder, lineWidth: 1))
+        .simpleCard(radius: 16)
     }
 
     private func reasonLabel(_ reason: String) -> String {
         switch reason {
-        case "notified":  return "已叫號"
-        case "finished":  return "診已結束"
-        case "skipped":   return "已過號"
-        case "cancelled": return "已取消"
-        default:          return "已結束"
+        case "notified", "arrived": return "已叫號"
+        case "finished":            return "診已結束"
+        case "skipped", "passed":   return "已過號"
+        case "cancelled":           return "已取消"
+        default:                    return "已結束"
         }
     }
 
     private func reasonColor(_ reason: String) -> Color {
         switch reason {
-        case "notified": return Color.appGreen
-        case "skipped":  return Color.appUrgency
-        default:         return Color.appTextSecondary
+        case "notified", "arrived": return .appOk
+        case "skipped", "passed":   return .appDanger
+        default:                    return .appInk2
         }
     }
-
-    // MARK: - Empty state
 
     private var emptyState: some View {
         VStack(spacing: 16) {
             Spacer()
-            Image(systemName: "clock.arrow.circlepath")
-                .font(.system(size: 60))
-                .foregroundStyle(Color.appGreen.opacity(0.25))
+            ZStack {
+                Circle().fill(Color.appAccentS).frame(width: 110, height: 110)
+                Image(systemName: "clock.arrow.circlepath")
+                    .font(.system(size: 54))
+                    .foregroundStyle(Color.appAccent.opacity(0.7))
+            }
             VStack(spacing: 8) {
                 Text("尚無看診紀錄")
-                    .font(.system(size: 18, weight: .semibold))
-                    .foregroundStyle(Color.appTextPrimary)
+                    .font(.system(size: 20, weight: .heavy))
+                    .foregroundStyle(Color.appInk)
                 Text("完成追蹤後，紀錄會自動儲存在這裡")
-                    .font(.system(size: 15))
-                    .foregroundStyle(Color.appTextSecondary)
+                    .font(.system(size: 16, weight: .semibold))
+                    .foregroundStyle(Color.appInkSoft)
                     .multilineTextAlignment(.center)
             }
             Spacer()

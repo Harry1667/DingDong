@@ -2,141 +2,126 @@ import SwiftUI
 
 struct DepartmentListView: View {
     @StateObject private var vm: ProgressViewModel
-    @State private var searchText = ""
+    @Environment(\.dismiss) private var dismiss
 
     init(hospital: Hospital) {
         _vm = StateObject(wrappedValue: ProgressViewModel(hospital: hospital))
     }
 
-    private var filteredGroups: [(dept: String, doctors: [ClinicProgress])] {
-        guard !searchText.isEmpty else { return vm.groupedByDepartment }
-        return vm.groupedByDepartment.filter {
-            $0.dept.localizedCaseInsensitiveContains(searchText) ||
-            $0.doctors.contains { $0.doctorName.localizedCaseInsensitiveContains(searchText) }
+    private var allDepartments: [String] {
+        Array(Set(vm.progressData.map { $0.department })).sorted()
+    }
+
+    private var sortedDepartments: [(name: String, isClosed: Bool, picks: Int)] {
+        let active = Set(allDepartments)
+        return active.map { name in
+            let picks = PersistenceService.shared.pickCount(
+                kind: "dept",
+                scope: vm.hospital.code,
+                item: name
+            )
+            return (name: name, isClosed: false, picks: picks)
+        }.sorted { lhs, rhs in
+            if lhs.isClosed != rhs.isClosed { return !lhs.isClosed }
+            if lhs.picks != rhs.picks { return lhs.picks > rhs.picks }
+            return lhs.name < rhs.name
         }
     }
 
     var body: some View {
-        ZStack {
-            Color.appBackground.ignoresSafeArea()
-            Group {
-                if vm.isLoading && vm.progressData.isEmpty {
-                    ProgressView("載入看診資料…")
-                        .tint(Color.appGreen)
-                        .frame(maxWidth: .infinity, maxHeight: .infinity)
-                } else if let error = vm.errorMessage, vm.progressData.isEmpty {
-                    errorView(message: error)
-                } else if vm.groupedByDepartment.isEmpty {
-                    noDataView
-                } else if filteredGroups.isEmpty {
-                    noResultsView
-                } else {
-                    departmentList
-                }
-            }
+        SimpleScreen {
+            SimpleTopBar(title: vm.hospital.name, onBack: { dismiss() })
+            SimpleStepTitle(title: "您要看哪一科？", step: 2, total: 4)
+        } content: {
+            content
         }
-        .navigationTitle(vm.hospital.name)
-        .navigationBarTitleDisplayMode(.inline)
-        .toolbar {
-            ToolbarItem(placement: .topBarTrailing) {
-                if let updated = vm.lastUpdated {
-                    Text(updated.relativeString)
-                        .font(.system(size: 11, design: .monospaced))
-                        .foregroundStyle(Color.appTextSecondary)
-                }
-            }
-        }
-        .searchable(text: $searchText, prompt: "搜尋科別或醫師")
         .task { await vm.load() }
-    }
-
-    private var departmentList: some View {
-        List {
-            ForEach(filteredGroups, id: \.dept) { group in
-                NavigationLink(destination: DoctorListView(
-                    hospital: vm.hospital,
-                    department: group.dept,
-                    progressVM: vm
-                )) {
-                    HStack {
-                        VStack(alignment: .leading, spacing: 3) {
-                            Text(group.dept)
-                                .font(.system(size: 15, weight: .semibold))
-                                .foregroundStyle(Color.appTextPrimary)
-                            Text("\(group.doctors.count) 位醫師")
-                                .font(.system(size: 12, design: .monospaced))
-                                .foregroundStyle(Color.appTextSecondary)
-                        }
-                        Spacer()
-                    }
-                    .contentShape(Rectangle())
-                }
-                .listRowBackground(Color.appSurface)
-            }
-        }
-        .listStyle(.insetGrouped)
-        .scrollContentBackground(.hidden)
         .refreshable { await vm.refresh() }
     }
 
-    private var noResultsView: some View {
-        VStack(spacing: 16) {
-            Image(systemName: "magnifyingglass")
-                .font(.system(size: 44))
-                .foregroundStyle(Color.appTextSecondary.opacity(0.4))
-            Text("找不到「\(searchText)」")
-                .font(.system(size: 17, weight: .semibold))
-                .foregroundStyle(Color.appTextPrimary)
-            Text("試試搜尋其他科別或醫師")
-                .font(.system(size: 14))
-                .foregroundStyle(Color.appTextSecondary)
+    @ViewBuilder
+    private var content: some View {
+        if vm.isLoading && vm.progressData.isEmpty {
+            VStack(spacing: 16) {
+                ProgressView().tint(Color.appAccent)
+                Text("載入看診資料…")
+                    .font(.system(size: 15, weight: .semibold))
+                    .foregroundStyle(Color.appInkSoft)
+            }
+            .frame(maxWidth: .infinity).padding(.top, 60)
+        } else if let error = vm.errorMessage, vm.progressData.isEmpty {
+            errorView(error)
+        } else if allDepartments.isEmpty {
+            noDataView
+        } else {
+            SimpleTwoColGrid {
+                ForEach(sortedDepartments, id: \.name) { item in
+                    let picks = item.picks
+                    let star: String? = picks >= 3 ? "⭐" : (picks >= 1 ? "•" : nil)
+                    NavigationLink {
+                        DoctorListView(
+                            hospital: vm.hospital,
+                            department: item.name,
+                            progressVM: vm
+                        )
+                        .onAppear {
+                            PersistenceService.shared.bumpPick(
+                                kind: "dept",
+                                scope: vm.hospital.code,
+                                item: item.name
+                            )
+                        }
+                    } label: {
+                        SimpleGridCard(
+                            title: item.name,
+                            subtitle: nil,
+                            isClosed: item.isClosed,
+                            trailingMark: star,
+                            minHeight: 90,
+                            action: {}
+                        )
+                        .allowsHitTesting(false)
+                    }
+                    .buttonStyle(.plain)
+                }
+            }
+            .padding(.top, 6)
         }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 
     private var noDataView: some View {
         let offHours = !TrackingService.isOperatingHours()
-        return VStack(spacing: 16) {
-            Image(systemName: offHours ? "moon.zzz" : "calendar.badge.exclamationmark")
-                .font(.system(size: 44))
-                .foregroundStyle(Color.appTextSecondary.opacity(0.4))
+        return VStack(spacing: 14) {
+            Text(offHours ? "🌙" : "📋").font(.system(size: 48))
             Text(offHours ? "目前非看診時間" : "今日無看診資料")
-                .font(.system(size: 17, weight: .semibold))
-                .foregroundStyle(Color.appTextPrimary)
-            Text(offHours ? "看診時間為週一至週六 07:00–21:00\n請於開診後再查詢" : "此醫院今日可能未開診，或資料尚未更新")
-                .font(.system(size: 14))
-                .foregroundStyle(Color.appTextSecondary)
+                .font(.system(size: 18, weight: .heavy))
+                .foregroundStyle(Color.appInk)
+            Text(offHours
+                ? "看診時間為週一至週六 07:00–21:00\n請於開診後再查詢"
+                : "此醫院今日可能未開診，或資料尚未更新")
+                .font(.system(size: 15))
+                .foregroundStyle(Color.appInkSoft)
                 .multilineTextAlignment(.center)
+                .lineSpacing(4)
         }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .padding()
+        .frame(maxWidth: .infinity).padding(.top, 40)
     }
 
-    private func errorView(message: String) -> some View {
-        VStack(spacing: 16) {
-            Image(systemName: "wifi.slash")
-                .font(.system(size: 44))
-                .foregroundStyle(Color.appTextSecondary.opacity(0.4))
+    private func errorView(_ message: String) -> some View {
+        VStack(spacing: 14) {
+            Text("⏳").font(.system(size: 48))
             Text("載入失敗")
-                .font(.system(size: 17, weight: .semibold))
-                .foregroundStyle(Color.appTextPrimary)
+                .font(.system(size: 18, weight: .heavy))
+                .foregroundStyle(Color.appInk)
             Text(message)
                 .font(.system(size: 14))
-                .foregroundStyle(Color.appTextSecondary)
+                .foregroundStyle(Color.appInkSoft)
                 .multilineTextAlignment(.center)
-            Button {
+            SimpleSecondaryButton(title: "重試") {
                 Task { await vm.load() }
-            } label: {
-                Text("重試")
-                    .font(.system(size: 14, weight: .semibold))
-                    .padding(.horizontal, 24)
-                    .padding(.vertical, 10)
-                    .background(Color.appGreen)
-                    .foregroundStyle(.white)
-                    .clipShape(Capsule())
             }
+            .padding(.horizontal, 60)
         }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .padding()
+        .frame(maxWidth: .infinity).padding(.top, 40)
     }
 }

@@ -9,130 +9,25 @@ struct SettingsView: View {
     var body: some View {
         NavigationStack {
             ZStack {
-                Color.appBackground.ignoresSafeArea()
-                List {
-                    // MARK: 提醒方式
-                    Section {
-                        Picker("提醒方式", selection: $vm.notifyMode) {
-                            ForEach(NotifyMode.allCases, id: \.self) { mode in
-                                Text(mode.displayName).tag(mode)
-                            }
+                Color.appBg.ignoresSafeArea()
+                VStack(spacing: 0) {
+                    header
+                    ScrollView {
+                        VStack(spacing: 14) {
+                            notifyModeCard
+                            otherNotifyCard
+                            refreshIntervalCard
+                            dataManagementCard
+                            otherCard
+                            aboutCard
                         }
-                        .pickerStyle(.segmented)
-                        .listRowBackground(Color.appSurface)
-
-                        Group {
-                            switch vm.notifyMode {
-                            case .light:
-                                Text("差 10、5、3、2、1 號時提醒，不打擾")
-                            case .normal:
-                                Text("進入門檻號數後，每次叫號都通知")
-                            case .final_:
-                                Text("只在差 3 號以內才提醒")
-                            }
-                        }
-                        .font(.system(size: 12))
-                        .foregroundStyle(Color.appTextSecondary)
-
-                        if vm.notifyMode != .final_ {
-                            Stepper(value: $vm.notifyThreshold, in: 1...20) {
-                                HStack {
-                                    Text("提前提醒")
-                                        .foregroundStyle(Color.appTextPrimary)
-                                    Spacer()
-                                    Text("差 \(vm.notifyThreshold) 號")
-                                        .font(.system(size: 13, design: .monospaced))
-                                        .foregroundStyle(Color.appGreen)
-                                }
-                            }
-                        }
-                    } header: {
-                        Text("通知")
+                        .padding(.horizontal, 16)
+                        .padding(.top, 6)
+                        .padding(.bottom, 32)
                     }
-                    .listRowBackground(Color.appSurface)
-
-                    // MARK: 其他通知設定
-                    Section {
-                        Toggle(isOn: $vm.hapticEnabled) {
-                            Text("震動提示")
-                                .foregroundStyle(Color.appTextPrimary)
-                        }
-                        .tint(Color.appGreen)
-
-                        if !notificationService.isAuthorized {
-                            Button {
-                                Task { await notificationService.requestAuthorization() }
-                            } label: {
-                                Label("開啟通知權限", systemImage: "bell.badge.fill")
-                                    .foregroundStyle(Color.appGreen)
-                            }
-                        }
-                    }
-                    .listRowBackground(Color.appSurface)
-
-                    // MARK: 更新頻率
-                    Section("更新頻率") {
-                        Picker("更新頻率", selection: $vm.refreshInterval) {
-                            Text("30 秒").tag(30)
-                            Text("1 分鐘").tag(60)
-                            Text("2 分鐘").tag(120)
-                        }
-                        .pickerStyle(.segmented)
-                        .listRowBackground(Color.appSurface)
-
-                        Text("越頻繁越耗電；背景追蹤建議 30 秒")
-                            .font(.system(size: 12))
-                            .foregroundStyle(Color.appTextSecondary)
-                    }
-                    .listRowBackground(Color.appSurface)
-
-                    // MARK: 資料管理
-                    Section("資料管理") {
-                        Button(role: .destructive) {
-                            showClearConfirm = true
-                        } label: {
-                            Label("清除所有追蹤任務", systemImage: "trash")
-                        }
-                    }
-                    .listRowBackground(Color.appSurface)
-
-                    // MARK: 其他
-                    Section("其他") {
-                        Button {
-                            if let url = URL(string: "mailto:amacooky.com@gmail.com?subject=叮咚到號意見回饋") {
-                                UIApplication.shared.open(url)
-                            }
-                        } label: {
-                            Label("意見回饋", systemImage: "envelope")
-                                .foregroundStyle(Color.appTextPrimary)
-                        }
-                    }
-                    .listRowBackground(Color.appSurface)
-
-                    // MARK: 關於
-                    Section("關於") {
-                        LabeledContent("版本", value: Bundle.main.appVersion)
-                            .foregroundStyle(Color.appTextPrimary)
-                        LabeledContent("資料來源", value: "dd.dl-app.com")
-                            .foregroundStyle(Color.appTextPrimary)
-                        NavigationLink(destination: PrivacyPolicyView()) {
-                            Text("隱私政策")
-                                .foregroundStyle(Color.appTextPrimary)
-                        }
-                    }
-                    .listRowBackground(Color.appSurface)
-                }
-                .listStyle(.insetGrouped)
-                .scrollContentBackground(.hidden)
-            }
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .principal) {
-                    Text("設定")
-                        .font(.system(size: 17, weight: .semibold))
-                        .foregroundStyle(Color.appTextPrimary)
                 }
             }
+            .navigationBarHidden(true)
             .alert("清除所有追蹤任務", isPresented: $showClearConfirm) {
                 Button("確定清除", role: .destructive) {
                     for task in trackingService.tasks {
@@ -145,6 +40,230 @@ struct SettingsView: View {
             }
         }
         .task { await notificationService.checkAuthorizationStatus() }
+    }
+
+    private var header: some View {
+        VStack(spacing: 4) {
+            HStack {
+                Spacer()
+                Text("叮咚到號")
+                    .font(.system(size: 18, weight: .heavy))
+                    .tracking(1)
+                    .foregroundStyle(Color.appInk)
+                Spacer()
+            }
+            .frame(height: 44)
+            Text("設定")
+                .font(.system(size: 22, weight: .heavy))
+                .tracking(-0.3)
+                .foregroundStyle(Color.appInk)
+                .frame(maxWidth: .infinity, alignment: .leading)
+        }
+        .padding(.horizontal, 16)
+        .padding(.top, 10)
+        .padding(.bottom, 8)
+    }
+
+    // MARK: ── Cards ─────────────────────────────────────────
+
+    private var notifyModeCard: some View {
+        settingCard("通知方式") {
+            VStack(spacing: 14) {
+                segmentPicker(
+                    items: NotifyMode.allCases.map { ($0.displayName, $0) },
+                    selection: $vm.notifyMode
+                )
+                Text(notifyDescription)
+                    .font(.system(size: 13, weight: .semibold))
+                    .foregroundStyle(Color.appInkSoft)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                if vm.notifyMode != .final_ {
+                    HStack {
+                        Text("提前提醒")
+                            .font(.system(size: 15, weight: .heavy))
+                            .foregroundStyle(Color.appInk)
+                        Spacer()
+                        Stepper(value: $vm.notifyThreshold, in: 1...20) {
+                            Text("差 \(vm.notifyThreshold) 號")
+                                .font(.system(size: 15, weight: .heavy, design: .monospaced))
+                                .foregroundStyle(Color.appAccentD)
+                        }
+                        .fixedSize()
+                    }
+                }
+            }
+        }
+    }
+
+    private var notifyDescription: String {
+        switch vm.notifyMode {
+        case .light:  return "差 10、5、3、2、1 號時提醒，不打擾"
+        case .normal: return "進入門檻號數後，每次叫號都通知"
+        case .final_: return "只在差 3 號以內才提醒"
+        }
+    }
+
+    private var otherNotifyCard: some View {
+        settingCard("其他提醒") {
+            VStack(spacing: 12) {
+                HStack {
+                    Text("震動提示")
+                        .font(.system(size: 15, weight: .heavy))
+                        .foregroundStyle(Color.appInk)
+                    Spacer()
+                    Toggle("", isOn: $vm.hapticEnabled)
+                        .labelsHidden()
+                        .tint(Color.appAccent)
+                }
+                if !notificationService.isAuthorized {
+                    Button {
+                        Task { await notificationService.requestAuthorization() }
+                    } label: {
+                        HStack {
+                            Image(systemName: "bell.badge.fill")
+                            Text("開啟通知權限")
+                                .font(.system(size: 15, weight: .heavy))
+                            Spacer()
+                            Image(systemName: "chevron.right")
+                                .font(.system(size: 12, weight: .heavy))
+                        }
+                        .foregroundStyle(Color.appAccentD)
+                    }
+                    .buttonStyle(.plain)
+                }
+            }
+        }
+    }
+
+    private var refreshIntervalCard: some View {
+        settingCard("更新頻率") {
+            VStack(spacing: 10) {
+                segmentPicker(
+                    items: [("30 秒", 30), ("1 分鐘", 60), ("2 分鐘", 120)],
+                    selection: $vm.refreshInterval
+                )
+                Text("越頻繁越耗電；背景追蹤建議 30 秒")
+                    .font(.system(size: 13, weight: .semibold))
+                    .foregroundStyle(Color.appInkSoft)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+            }
+        }
+    }
+
+    private var dataManagementCard: some View {
+        settingCard("資料管理") {
+            Button(role: .destructive) {
+                showClearConfirm = true
+            } label: {
+                HStack {
+                    Image(systemName: "trash")
+                    Text("清除所有追蹤任務")
+                        .font(.system(size: 15, weight: .heavy))
+                    Spacer()
+                }
+                .foregroundStyle(Color.appDangerD)
+                .padding(.vertical, 4)
+            }
+            .buttonStyle(.plain)
+        }
+    }
+
+    private var otherCard: some View {
+        settingCard("其他") {
+            Button {
+                if let url = URL(string: "mailto:amacooky.com@gmail.com?subject=叮咚到號意見回饋") {
+                    UIApplication.shared.open(url)
+                }
+            } label: {
+                HStack {
+                    Image(systemName: "envelope")
+                    Text("意見回饋")
+                        .font(.system(size: 15, weight: .heavy))
+                    Spacer()
+                    Image(systemName: "chevron.right")
+                        .font(.system(size: 12, weight: .heavy))
+                }
+                .foregroundStyle(Color.appInk)
+                .padding(.vertical, 4)
+            }
+            .buttonStyle(.plain)
+        }
+    }
+
+    private var aboutCard: some View {
+        settingCard("關於") {
+            VStack(spacing: 12) {
+                infoRow(label: "版本", value: Bundle.main.appVersion)
+                infoRow(label: "資料來源", value: "dd.dl-app.com")
+                NavigationLink(destination: PrivacyPolicyView()) {
+                    HStack {
+                        Text("隱私政策")
+                            .font(.system(size: 15, weight: .heavy))
+                        Spacer()
+                        Image(systemName: "chevron.right")
+                            .font(.system(size: 12, weight: .heavy))
+                    }
+                    .foregroundStyle(Color.appInk)
+                    .padding(.vertical, 4)
+                }
+                .buttonStyle(.plain)
+            }
+        }
+    }
+
+    // MARK: ── Helpers ──────────────────────────────────────
+
+    private func settingCard<Content: View>(_ title: String,
+                                            @ViewBuilder content: () -> Content) -> some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text(title)
+                .font(.system(size: 12, weight: .heavy))
+                .tracking(2)
+                .foregroundStyle(Color.appInkSoft)
+                .padding(.horizontal, 2)
+            VStack(alignment: .leading, spacing: 0) {
+                content()
+            }
+            .padding(16)
+            .simpleCard(radius: 16)
+        }
+    }
+
+    private func infoRow(label: String, value: String) -> some View {
+        HStack {
+            Text(label)
+                .font(.system(size: 15, weight: .heavy))
+                .foregroundStyle(Color.appInk)
+            Spacer()
+            Text(value)
+                .font(.system(size: 14, weight: .semibold, design: .monospaced))
+                .foregroundStyle(Color.appInkSoft)
+        }
+        .padding(.vertical, 4)
+    }
+
+    private func segmentPicker<T: Hashable>(items: [(String, T)],
+                                            selection: Binding<T>) -> some View {
+        HStack(spacing: 6) {
+            ForEach(items, id: \.1) { (title, value) in
+                Button {
+                    selection.wrappedValue = value
+                } label: {
+                    Text(title)
+                        .font(.system(size: 14, weight: .heavy))
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 10)
+                        .foregroundStyle(selection.wrappedValue == value ? .white : Color.appInk)
+                        .background(selection.wrappedValue == value ? Color.appAccent : Color.appCard)
+                        .clipShape(RoundedRectangle(cornerRadius: 12))
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 12)
+                                .stroke(selection.wrappedValue == value ? Color.appAccent : Color.appBorder, lineWidth: 2)
+                        )
+                }
+                .buttonStyle(.plain)
+            }
+        }
     }
 }
 

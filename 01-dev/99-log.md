@@ -1,20 +1,71 @@
+# 叮咚到號 — 開發日誌
 
-Showing All Errors Only
+## 2026-05-12 — 專案啟動
 
-Build target DingDong of project DingDong with configuration Debug
+### 完成事項
+- 探索網站 https://dd.dl-app.com 的完整操作流程
+- 分析後端原始碼 (`dindon-web/`)，確認可用 API endpoints
+- 確認後端已有完整 REST API，iOS App 可直接呼叫，無需建立 proxy
+- 填寫完整開發文件（PRD、User Flow、Tech Stack、Detail Data）
 
-SwiftCompile normal arm64 Compiling\ ContentView.swift /Users/gomigo/Documents/0-Dev/3-AppDev/05-DingDong/02-dingdong/DingDong/App/ContentView.swift (in target 'DingDong' from project 'DingDong')
+### 關鍵發現
+- 後端支援 **29 間**醫院（比網站首頁顯示的 5 間多很多）
+- API `/api/progress/{code}` 回傳完整科別 + 醫師 + 即時號碼，不需要模擬網頁操作
+- 後端已有 Web Push 基礎設施（VAPID），但 iOS 需要 APNs，MVP 先用本地通知
+- 追蹤邏輯全在前端（每 30 秒輪詢），後端 `/api/track/start` 只做分析記錄用
+- 後端使用 `guest_id` 識別匿名用戶（格式：`g_{timestamp36}_{random6}`），Keychain 存儲
 
-Failed frontend command:
-/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swift-frontend -frontend -c /Users/gomigo/Documents/0-Dev/3-AppDev/05-DingDong/02-dingdong/DingDong/Core/Network/APIClient.swift /Users/gomigo/Documents/0-Dev/3-AppDev/05-DingDong/02-dingdong/DingDong/Core/Network/APIEndpoints.swift /Users/gomigo/Documents/0-Dev/3-AppDev/05-DingDong/02-dingdong/DingDong/Core/Services/BackgroundService.swift /Users/gomigo/Documents/0-Dev/3-AppDev/05-DingDong/02-dingdong/DingDong/Core/Models/ClinicProgress.swift /Users/gomigo/Documents/0-Dev/3-AppDev/05-DingDong/02-dingdong/DingDong/Core/Extensions/Color+App.swift -primary-file /Users/gomigo/Documents/0-Dev/3-AppDev/05-DingDong/02-dingdong/DingDong/App/ContentView.swift /Users/gomigo/Documents/0-Dev/3-AppDev/05-DingDong/02-dingdong/DingDong/Core/Extensions/Date+Format.swift /Users/gomigo/Documents/0-Dev/3-AppDev/05-DingDong/02-dingdong/DingDong/Core/Models/Department.swift /Users/gomigo/Documents/0-Dev/3-AppDev/05-DingDong/02-dingdong/DingDong/Features/Progress/DepartmentListView.swift /Users/gomigo/Documents/0-Dev/3-AppDev/05-DingDong/02-dingdong/DingDong/App/DingDongApp.swift /Users/gomigo/Documents/0-Dev/3-AppDev/05-DingDong/02-dingdong/DingDong/Features/Progress/DoctorListView.swift /Users/gomigo/Documents/0-Dev/3-AppDev/05-DingDong/02-dingdong/DingDong/Features/Progress/DoctorProgressCard.swift /Users/gomigo/Documents/0-Dev/3-AppDev/05-DingDong/02-dingdong/DingDong/Core/Models/FavoriteDoctor.swift /Users/gomigo/Documents/0-Dev/3-AppDev/05-DingDong/02-dingdong/DingDong/Core/Services/FavoriteService.swift /Users/gomigo/Documents/0-Dev/3-AppDev/05-DingDong/02-dingdong/DingDong/Features/Home/HomeView.swift /Users/gomigo/Documents/0-Dev/3-AppDev/05-DingDong/02-dingdong/DingDong/Features/Home/HomeViewModel.swift /Users/gomigo/Documents/0-Dev/3-AppDev/05-DingDong/02-dingdong/DingDong/Core/Models/Hospital.swift /Users/gomigo/Documents/0-Dev/3-AppDev/05-DingDong/02-dingdong/DingDong/Features/Hospital/HospitalListView.swift /Users/gomigo/Documents/0-Dev/3-AppDev/05-DingDong/02-dingdong/DingDong/Features/Hospital/HospitalRowView.swift /Users/gomigo/Documents/0-Dev/3-AppDev/05-DingDong/02-dingdong/DingDong/Core/Services/HospitalService.swift /Users/gomigo/Documents/0-Dev/3-AppDev/05-DingDong/02-dingdong/DingDong/Features/Hospital/HospitalViewModel.swift /Users/gomigo/Documents/0-Dev/3-AppDev/05-DingDong/02-dingdong/DingDong/Core/Network/NetworkError.swift /Users/gomigo/Documents/0-Dev/3-AppDev/05-DingDong/02-dingdong/DingDong/Core/Services/NotificationService.swift /Users/gomigo/Documents/0-Dev/3-AppDev/05-DingDong/02-dingdong/DingDong/Features/Onboarding/OnboardingView.swift /Users/gomigo/Documents/0-Dev/3-AppDev/05-DingDong/02-dingdong/DingDong/Core/Services/PersistenceService.swift /Users/gomigo/Documents/0-Dev/3-AppDev/05-DingDong/02-dingdong/DingDong/Features/Progress/ProgressViewModel.swift /Users/gomigo/Documents/0-Dev/3-AppDev/05-DingDong/02-dingdong/DingDong/Features/Settings/SettingsView.swift /Users/gomigo/Documents/0-Dev/3-AppDev/05-DingDong/02-dingdong/DingDong/Features/Settings/SettingsViewModel.swift /Users/gomigo/Documents/0-Dev/3-AppDev/05-DingDong/02-dingdong/DingDong/Features/Home/StopFeedbackSheet.swift /Users/gomigo/Documents/0-Dev/3-AppDev/05-DingDong/02-dingdong/DingDong/Features/Home/TrackingCardView.swift /Users/gomigo/Documents/0-Dev/3-AppDev/05-DingDong/02-dingdong/DingDong/Features/Tracking/TrackingDetailView.swift /Users/gomigo/Documents/0-Dev/3-AppDev/05-DingDong/02-dingdong/DingDong/Core/Services/TrackingService.swift /Users/gomigo/Documents/0-Dev/3-AppDev/05-DingDong/02-dingdong/DingDong/Features/Tracking/TrackingSetupView.swift /Users/gomigo/Documents/0-Dev/3-AppDev/05-DingDong/02-dingdong/DingDong/Core/Models/TrackingTask.swift /Users/gomigo/Documents/0-Dev/3-AppDev/05-DingDong/02-dingdong/DingDong/Features/Tracking/TrackingViewModel.swift /Users/gomigo/Documents/0-Dev/3-AppDev/05-DingDong/02-dingdong/DingDong/Core/Extensions/View+Modifiers.swift /Users/gomigo/Library/Developer/Xcode/DerivedData/DingDong-dxuxdqhwhpccpfarwopumgiaqwxb/Build/Intermediates.noindex/DingDong.build/Debug-iphonesimulator/DingDong.build/DerivedSources/GeneratedAssetSymbols.swift -emit-dependencies-path /Users/gomigo/Library/Developer/Xcode/DerivedData/DingDong-dxuxdqhwhpccpfarwopumgiaqwxb/Build/Intermediates.noindex/DingDong.build/Debug-iphonesimulator/DingDong.build/Objects-normal/arm64/ContentView.d -emit-const-values-path /Users/gomigo/Library/Developer/Xcode/DerivedData/DingDong-dxuxdqhwhpccpfarwopumgiaqwxb/Build/Intermediates.noindex/DingDong.build/Debug-iphonesimulator/DingDong.build/Objects-normal/arm64/ContentView.swiftconstvalues -emit-reference-dependencies-path /Users/gomigo/Library/Developer/Xcode/DerivedData/DingDong-dxuxdqhwhpccpfarwopumgiaqwxb/Build/Intermediates.noindex/DingDong.build/Debug-iphonesimulator/DingDong.build/Objects-normal/arm64/ContentView.swiftdeps -serialize-diagnostics-path /Users/gomigo/Library/Developer/Xcode/DerivedData/DingDong-dxuxdqhwhpccpfarwopumgiaqwxb/Build/Intermediates.noindex/DingDong.build/Debug-iphonesimulator/DingDong.build/Objects-normal/arm64/ContentView.dia -target arm64-apple-ios16.0-simulator -module-can-import-version DeveloperToolsSupport 23.40.26 23.40.26 -module-can-import-version SwiftUI 7.4.27.1 7.4.27 -module-can-import-version UIKit 9126.4.27.1 9126.4.27 -load-resolved-plugin /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/lib/swift/host/plugins/libFoundationMacros.dylib\#/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/swift-plugin-server\#FoundationMacros -load-resolved-plugin /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/lib/swift/host/plugins/libObservationMacros.dylib\#/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/swift-plugin-server\#ObservationMacros -load-resolved-plugin /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/lib/swift/host/plugins/libPreviewsMacros.dylib\#/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/swift-plugin-server\#PreviewsMacros -load-resolved-plugin /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/lib/swift/host/plugins/libSwiftMacros.dylib\#/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/swift-plugin-server\#SwiftMacros -load-resolved-plugin /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/lib/swift/host/plugins/libSwiftUIMacros.dylib\#/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/swift-plugin-server\#SwiftUIMacros -disable-implicit-swift-modules -Xcc -fno-implicit-modules -Xcc -fno-implicit-module-maps -explicit-swift-module-map-file /Users/gomigo/Library/Developer/Xcode/DerivedData/DingDong-dxuxdqhwhpccpfarwopumgiaqwxb/Build/Intermediates.noindex/DingDong.build/Debug-iphonesimulator/DingDong.build/Objects-normal/arm64/DingDong-dependencies-40.json -debug-module-path /Users/gomigo/Library/Developer/Xcode/DerivedData/DingDong-dxuxdqhwhpccpfarwopumgiaqwxb/Build/Intermediates.noindex/DingDong.build/Debug-iphonesimulator/DingDong.build/Objects-normal/arm64/DingDong.swiftmodule -Xllvm -aarch64-use-tbi -enable-objc-interop -sdk /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.4.sdk -I /Users/gomigo/Library/Developer/Xcode/DerivedData/DingDong-dxuxdqhwhpccpfarwopumgiaqwxb/Build/Products/Debug-iphonesimulator -F /Users/gomigo/Library/Developer/Xcode/DerivedData/DingDong-dxuxdqhwhpccpfarwopumgiaqwxb/Build/Products/Debug-iphonesimulator -no-color-diagnostics -Xcc -fno-color-diagnostics -enable-testing -g -debug-info-format\=dwarf -dwarf-version\=4 -module-cache-path /Users/gomigo/Library/Developer/Xcode/DerivedData/DingDong-dxuxdqhwhpccpfarwopumgiaqwxb/Build/Intermediates.noindex/SwiftExplicitPrecompiledModules -swift-version 5 -Onone -D DEBUG -serialize-debugging-options -const-gather-protocols-file /Users/gomigo/Library/Developer/Xcode/DerivedData/DingDong-dxuxdqhwhpccpfarwopumgiaqwxb/Build/Intermediates.noindex/DingDong.build/Debug-iphonesimulator/DingDong.build/Objects-normal/arm64/DingDong_const_extract_protocols.json -enable-experimental-feature DebugDescriptionMacro -enable-bare-slash-regex -empty-abi-descriptor -validate-clang-modules-once -clang-build-session-file /Users/gomigo/Library/Developer/Xcode/DerivedData/ModuleCache.noindex/Session.modulevalidation -Xcc -working-directory -Xcc /Users/gomigo/Documents/0-Dev/3-AppDev/05-DingDong/02-dingdong -enable-anonymous-context-mangled-names -file-compilation-dir /Users/gomigo/Documents/0-Dev/3-AppDev/05-DingDong/02-dingdong -Xcc -D_LIBCPP_HARDENING_MODE\=_LIBCPP_HARDENING_MODE_DEBUG -Xcc -ivfsstatcache -Xcc /Users/gomigo/Library/Developer/Xcode/DerivedData/SDKStatCaches.noindex/iphonesimulator26.4-23E237-686eebb5dc1d8ecb277353a59184f4aa.sdkstatcache -Xcc -I/Users/gomigo/Library/Developer/Xcode/DerivedData/DingDong-dxuxdqhwhpccpfarwopumgiaqwxb/Build/Intermediates.noindex/DingDong.build/Debug-iphonesimulator/DingDong.build/swift-overrides.hmap -Xcc -iquote -Xcc /Users/gomigo/Library/Developer/Xcode/DerivedData/DingDong-dxuxdqhwhpccpfarwopumgiaqwxb/Build/Intermediates.noindex/DingDong.build/Debug-iphonesimulator/DingDong.build/DingDong-generated-files.hmap -Xcc -I/Users/gomigo/Library/Developer/Xcode/DerivedData/DingDong-dxuxdqhwhpccpfarwopumgiaqwxb/Build/Intermediates.noindex/DingDong.build/Debug-iphonesimulator/DingDong.build/DingDong-own-target-headers.hmap -Xcc -I/Users/gomigo/Library/Developer/Xcode/DerivedData/DingDong-dxuxdqhwhpccpfarwopumgiaqwxb/Build/Intermediates.noindex/DingDong.build/Debug-iphonesimulator/DingDong.build/DingDong-all-target-headers.hmap -Xcc -iquote -Xcc /Users/gomigo/Library/Developer/Xcode/DerivedData/DingDong-dxuxdqhwhpccpfarwopumgiaqwxb/Build/Intermediates.noindex/DingDong.build/Debug-iphonesimulator/DingDong.build/DingDong-project-headers.hmap -Xcc -I/Users/gomigo/Library/Developer/Xcode/DerivedData/DingDong-dxuxdqhwhpccpfarwopumgiaqwxb/Build/Products/Debug-iphonesimulator/include -Xcc -I/Users/gomigo/Library/Developer/Xcode/DerivedData/DingDong-dxuxdqhwhpccpfarwopumgiaqwxb/Build/Intermediates.noindex/DingDong.build/Debug-iphonesimulator/DingDong.build/DerivedSources-normal/arm64 -Xcc -I/Users/gomigo/Library/Developer/Xcode/DerivedData/DingDong-dxuxdqhwhpccpfarwopumgiaqwxb/Build/Intermediates.noindex/DingDong.build/Debug-iphonesimulator/DingDong.build/DerivedSources/arm64 -Xcc -I/Users/gomigo/Library/Developer/Xcode/DerivedData/DingDong-dxuxdqhwhpccpfarwopumgiaqwxb/Build/Intermediates.noindex/DingDong.build/Debug-iphonesimulator/DingDong.build/DerivedSources -Xcc -DDEBUG\=1 -no-auto-bridging-header-chaining -module-name DingDong -frontend-parseable-output -disable-clang-spi -clang-target arm64-apple-ios26.4-simulator -target-sdk-version 26.4 -target-sdk-name iphonesimulator26.4 -in-process-plugin-server-path /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/host/libSwiftInProcPluginServer.dylib -o /Users/gomigo/Library/Developer/Xcode/DerivedData/DingDong-dxuxdqhwhpccpfarwopumgiaqwxb/Build/Intermediates.noindex/DingDong.build/Debug-iphonesimulator/DingDong.build/Objects-normal/arm64/ContentView.o -index-unit-output-path /DingDong.build/Debug-iphonesimulator/DingDong.build/Objects-normal/arm64/ContentView.o -index-store-path /Users/gomigo/Library/Developer/Xcode/DerivedData/DingDong-dxuxdqhwhpccpfarwopumgiaqwxb/Index.noindex/DataStore -index-system-modules
+### 確認的技術決策
+- SwiftUI + iOS 16+ + 零第三方依賴
+- 本地通知（UNUserNotificationCenter）作為 MVP 通知方案
+- BGAppRefreshTask 實現背景輪詢
+- MVVM 架構，每個 Feature 資料夾含 View + ViewModel
+- Widget Target（WidgetKit）從一開始就建立
 
-SwiftCompile normal arm64 /Users/gomigo/Documents/0-Dev/3-AppDev/05-DingDong/02-dingdong/DingDong/App/ContentView.swift (in target 'DingDong' from project 'DingDong')
-    cd /Users/gomigo/Documents/0-Dev/3-AppDev/05-DingDong/02-dingdong
-    
+### 待辦
+- [ ] 建立 Xcode 專案（Bundle ID: com.ajz.dingdong）
+- [ ] 實作 APIClient + 所有 Endpoint
+- [ ] 實作 HospitalListView + 搜尋
+- [ ] 實作 DepartmentListView + DoctorListView
+- [ ] 實作 TrackingService + 本地通知
+- [ ] 實作 BackgroundService（BGAppRefreshTask）
+- [ ] 實作 Widget
+- [ ] 測試所有 API endpoints（正式環境）
 
-/Users/gomigo/Documents/0-Dev/3-AppDev/05-DingDong/02-dingdong/DingDong/App/ContentView.swift:17:17: error: cannot find 'FavoritesView' in scope
-                FavoritesView()
-                ^~~~~~~~~~~~~
+---
 
-/Users/gomigo/Documents/0-Dev/3-AppDev/05-DingDong/02-dingdong/DingDong/App/ContentView.swift:17:17: Cannot find 'FavoritesView' in scope
+## 2026-05-14 — 長輩版設計系統全面導入
 
+### 完成事項
+- 全面套用 https://dd.dl-app.com/simple 的長輩版設計語言（暖奶油底 / 橘色 CTA / 大字級 / 立體 3D 按鈕）
+- Color+App.swift 重寫色票系統（appBg / appAccent / appInk / appOk 等 25+ token）
+- 新增 SimpleStyles.swift 共用元件庫（SimpleScreen / SimpleTopBar / SimpleStepTitle / SimpleRegionTabs / SimpleTwoColGrid / SimpleGridCard / SimplePrimaryButton / SimpleSecondaryButton / SimpleLiveDot / simpleCard modifier）
+- 4 步流程全部重寫：
+  - Step 1 HospitalListView (HospitalPicker 重寫：北/中/南 tabs + 兩欄 grid + pickCount ⭐)
+  - Step 2 DepartmentListView (兩欄科別卡 + pickCount)
+  - Step 3 DoctorListView (兩欄醫師卡 + 「目前看到 N 號」橘框 + 休診頁)
+  - Step 4 TrackingSetupView (上方 info 卡 + 自製 4×3 鍵盤)
+- HomeView 重寫：橘色立體 CTA、新追蹤卡 TrackingCardView（左資料右橘框，4 狀態色）
+- 新增 TrackingDetailView：info-hero + 雙 stat 卡 + 4 步驟 progress + CTA + 追加/停止
+- OnboardingView / SettingsView / HistoryView / PrivacyPolicyView / StopFeedbackSheet / AddFavoriteBrowserSheet 全套新風格
+- ContentView TabBar tint=appAccent，UITabBarAppearance 暖底
+- PersistenceService 新增 pickCount / bumpPick API（hospital/dept/doctor 常用排序）
+- 刪除舊檔：DoctorProgressCard.swift、HospitalRowView.swift（被 SimpleGridCard 取代）
+- View+Modifiers.swift 清空（modifier 集中到 SimpleStyles.swift）
+
+### 驗證
+- xcodegen generate ✓
+- xcodebuild DingDong target ✓ BUILD SUCCEEDED
+- xcodebuild DingDongWidget target ✓ BUILD SUCCEEDED
+
+### 待辦
+- [ ] 模擬器跑 app 視覺確認
+- [ ] iOS 暗黑模式（目前色票都是固定值）
+- [ ] 常用醫師無出診的標示
+
+<!-- 新增記錄請往下加，格式：
+## YYYY-MM-DD — 標題
+### 完成事項
+### 問題與決策
+### 待辦
+-->

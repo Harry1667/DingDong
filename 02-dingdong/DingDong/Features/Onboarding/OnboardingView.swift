@@ -7,12 +7,13 @@ struct OnboardingView: View {
 
     var body: some View {
         ZStack {
-            Color.appBackground.ignoresSafeArea()
+            Color.appBg.ignoresSafeArea()
             TabView(selection: $page) {
                 welcomePage.tag(0)
                 notificationPage.tag(1)
             }
             .tabViewStyle(.page(indexDisplayMode: .always))
+            .indexViewStyle(.page(backgroundDisplayMode: .always))
             .animation(.easeInOut, value: page)
         }
     }
@@ -21,47 +22,44 @@ struct OnboardingView: View {
         VStack(spacing: 0) {
             Spacer()
 
-            RoundedRectangle(cornerRadius: 28)
-                .fill(Color.appGreen)
-                .frame(width: 108, height: 108)
-                .overlay(
-                    Image(systemName: "bell.fill")
-                        .font(.system(size: 48))
-                        .foregroundStyle(.white)
-                )
-                .padding(.bottom, 32)
+            ZStack {
+                RoundedRectangle(cornerRadius: 28)
+                    .fill(LinearGradient(
+                        colors: [Color.appAccent, Color.appAccentD],
+                        startPoint: .top, endPoint: .bottom))
+                    .frame(width: 120, height: 120)
+                    .shadow(color: Color.appAccentDD.opacity(0.8), radius: 0, x: 0, y: 6)
+                Image(systemName: "bell.fill")
+                    .font(.system(size: 52, weight: .heavy))
+                    .foregroundStyle(.white)
+            }
+            .padding(.bottom, 36)
 
             Text("叮咚到號")
-                .font(.system(size: 34, weight: .bold, design: .serif))
-                .foregroundStyle(Color.appTextPrimary)
+                .font(.system(size: 36, weight: .heavy))
+                .tracking(1)
+                .foregroundStyle(Color.appInk)
                 .padding(.bottom, 10)
 
             Text("不用守在醫院\n叫到號立刻通知您")
-                .font(.system(size: 17))
-                .foregroundStyle(Color.appTextSecondary)
+                .font(.system(size: 18, weight: .semibold))
+                .foregroundStyle(Color.appInkSoft)
                 .multilineTextAlignment(.center)
                 .lineSpacing(6)
-                .padding(.bottom, 48)
+                .padding(.bottom, 44)
 
-            VStack(alignment: .leading, spacing: 22) {
-                stepRow(number: "1", icon: "cross.case.fill",   text: "選擇醫院和醫師")
-                stepRow(number: "2", icon: "number.circle.fill", text: "輸入您的掛號號碼")
-                stepRow(number: "3", icon: "bell.badge.fill",    text: "輪到時立即收到通知")
+            VStack(alignment: .leading, spacing: 20) {
+                stepRow(number: "1", text: "選擇您要去的醫院")
+                stepRow(number: "2", text: "選科別與醫師")
+                stepRow(number: "3", text: "輸入您的候診號碼")
+                stepRow(number: "4", text: "叫到號立刻通知")
             }
-            .padding(.horizontal, 48)
+            .padding(.horizontal, 40)
 
             Spacer()
 
-            Button {
+            SimplePrimaryButton(title: "下一步") {
                 withAnimation { page = 1 }
-            } label: {
-                Text("下一步")
-                    .font(.system(size: 16, weight: .semibold))
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 16)
-                    .background(Color.appGreen)
-                    .foregroundStyle(.white)
-                    .clipShape(RoundedRectangle(cornerRadius: 20))
             }
             .padding(.horizontal, 40)
             .padding(.bottom, 56)
@@ -71,46 +69,40 @@ struct OnboardingView: View {
     private var notificationPage: some View {
         VStack(spacing: 0) {
             Spacer()
-
-            Image(systemName: "bell.badge.fill")
-                .font(.system(size: 72))
-                .foregroundStyle(Color.appGreen)
-                .padding(.bottom, 32)
+            ZStack {
+                Circle()
+                    .fill(Color.appAccentS)
+                    .frame(width: 140, height: 140)
+                Image(systemName: "bell.badge.fill")
+                    .font(.system(size: 70))
+                    .foregroundStyle(Color.appAccent)
+            }
+            .padding(.bottom, 36)
 
             Text("開啟通知")
-                .font(.system(size: 28, weight: .bold))
-                .foregroundStyle(Color.appTextPrimary)
+                .font(.system(size: 30, weight: .heavy))
+                .foregroundStyle(Color.appInk)
                 .padding(.bottom, 10)
 
             Text("叫到號時需要傳送通知給您\n請允許叮咚到號傳送通知")
-                .font(.system(size: 16))
-                .foregroundStyle(Color.appTextSecondary)
+                .font(.system(size: 17, weight: .semibold))
+                .foregroundStyle(Color.appInkSoft)
                 .multilineTextAlignment(.center)
                 .lineSpacing(6)
-
             Spacer()
 
             VStack(spacing: 12) {
-                Button {
+                SimplePrimaryButton(title: "允許通知") {
                     Task {
                         await notificationService.requestAuthorization()
                         onComplete()
                     }
-                } label: {
-                    Text("允許通知")
-                        .font(.system(size: 16, weight: .semibold))
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 16)
-                        .background(Color.appGreen)
-                        .foregroundStyle(.white)
-                        .clipShape(RoundedRectangle(cornerRadius: 20))
                 }
-
                 Button { onComplete() } label: {
                     Text("稍後再說")
-                        .font(.system(size: 14))
-                        .foregroundStyle(Color.appTextSecondary)
-                        .padding(.vertical, 8)
+                        .font(.system(size: 15, weight: .semibold))
+                        .foregroundStyle(Color.appInkSoft)
+                        .padding(.vertical, 12)
                 }
             }
             .padding(.horizontal, 40)
@@ -118,15 +110,18 @@ struct OnboardingView: View {
         }
     }
 
-    private func stepRow(number: String, icon: String, text: String) -> some View {
-        HStack(spacing: 16) {
-            Image(systemName: icon)
-                .font(.system(size: 22))
-                .foregroundStyle(Color.appGreen)
-                .frame(width: 30)
+    private func stepRow(number: String, text: String) -> some View {
+        HStack(spacing: 14) {
+            Text(number)
+                .font(.system(size: 18, weight: .heavy))
+                .foregroundStyle(.white)
+                .frame(width: 32, height: 32)
+                .background(Color.appAccent)
+                .clipShape(Circle())
+                .shadow(color: Color.appAccentD, radius: 0, x: 0, y: 2)
             Text(text)
-                .font(.system(size: 16))
-                .foregroundStyle(Color.appTextPrimary)
+                .font(.system(size: 17, weight: .bold))
+                .foregroundStyle(Color.appInk)
         }
     }
 }
