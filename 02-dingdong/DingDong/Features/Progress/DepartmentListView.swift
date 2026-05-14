@@ -2,9 +2,18 @@ import SwiftUI
 
 struct DepartmentListView: View {
     @StateObject private var vm: ProgressViewModel
+    @State private var searchText = ""
 
     init(hospital: Hospital) {
         _vm = StateObject(wrappedValue: ProgressViewModel(hospital: hospital))
+    }
+
+    private var filteredGroups: [(dept: String, doctors: [ClinicProgress])] {
+        guard !searchText.isEmpty else { return vm.groupedByDepartment }
+        return vm.groupedByDepartment.filter {
+            $0.dept.localizedCaseInsensitiveContains(searchText) ||
+            $0.doctors.contains { $0.doctorName.localizedCaseInsensitiveContains(searchText) }
+        }
     }
 
     var body: some View {
@@ -19,6 +28,8 @@ struct DepartmentListView: View {
                     errorView(message: error)
                 } else if vm.groupedByDepartment.isEmpty {
                     noDataView
+                } else if filteredGroups.isEmpty {
+                    noResultsView
                 } else {
                     departmentList
                 }
@@ -35,16 +46,16 @@ struct DepartmentListView: View {
                 }
             }
         }
+        .searchable(text: $searchText, prompt: "搜尋科別或醫師")
         .task { await vm.load() }
     }
 
     private var departmentList: some View {
         List {
-            ForEach(vm.groupedByDepartment, id: \.dept) { group in
+            ForEach(filteredGroups, id: \.dept) { group in
                 NavigationLink(destination: DoctorListView(
                     hospital: vm.hospital,
                     department: group.dept,
-                    doctors: group.doctors,
                     progressVM: vm
                 )) {
                     HStack {
@@ -66,6 +77,21 @@ struct DepartmentListView: View {
         .listStyle(.insetGrouped)
         .scrollContentBackground(.hidden)
         .refreshable { await vm.refresh() }
+    }
+
+    private var noResultsView: some View {
+        VStack(spacing: 16) {
+            Image(systemName: "magnifyingglass")
+                .font(.system(size: 44))
+                .foregroundStyle(Color.appTextSecondary.opacity(0.4))
+            Text("找不到「\(searchText)」")
+                .font(.system(size: 17, weight: .semibold))
+                .foregroundStyle(Color.appTextPrimary)
+            Text("試試搜尋其他科別或醫師")
+                .font(.system(size: 14))
+                .foregroundStyle(Color.appTextSecondary)
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 
     private var noDataView: some View {

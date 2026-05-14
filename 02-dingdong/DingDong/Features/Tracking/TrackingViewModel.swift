@@ -1,5 +1,9 @@
 import Foundation
 
+extension Notification.Name {
+    static let didStartNewTracking = Notification.Name("DingDong.didStartNewTracking")
+}
+
 @MainActor
 final class TrackingViewModel: ObservableObject {
     @Published var userNumberText = ""
@@ -46,6 +50,7 @@ final class TrackingViewModel: ObservableObject {
                 threshold: threshold,
                 scheduledDate: effectiveScheduledDate
             )
+            NotificationCenter.default.post(name: .didStartNewTracking, object: nil)
             didStartTracking = true
         } catch {
             errorMessage = error.localizedDescription

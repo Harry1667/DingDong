@@ -11,36 +11,6 @@ struct SettingsView: View {
             ZStack {
                 Color.appBackground.ignoresSafeArea()
                 List {
-                    // MARK: 通知
-                    Section("通知") {
-                        Stepper(value: $vm.notifyThreshold, in: 1...20) {
-                            HStack {
-                                Text("提前提醒")
-                                    .foregroundStyle(Color.appTextPrimary)
-                                Spacer()
-                                Text("差 \(vm.notifyThreshold) 號")
-                                    .font(.system(size: 13, design: .monospaced))
-                                    .foregroundStyle(Color.appGreen)
-                            }
-                        }
-
-                        Toggle(isOn: $vm.hapticEnabled) {
-                            Text("震動提示")
-                                .foregroundStyle(Color.appTextPrimary)
-                        }
-                        .tint(Color.appGreen)
-
-                        if !notificationService.isAuthorized {
-                            Button {
-                                Task { await notificationService.requestAuthorization() }
-                            } label: {
-                                Label("開啟通知權限", systemImage: "bell.badge.fill")
-                                    .foregroundStyle(Color.appGreen)
-                            }
-                        }
-                    }
-                    .listRowBackground(Color.appSurface)
-
                     // MARK: 提醒方式
                     Section {
                         Picker("提醒方式", selection: $vm.notifyMode) {
@@ -63,8 +33,40 @@ struct SettingsView: View {
                         }
                         .font(.system(size: 12))
                         .foregroundStyle(Color.appTextSecondary)
+
+                        if vm.notifyMode != .final_ {
+                            Stepper(value: $vm.notifyThreshold, in: 1...20) {
+                                HStack {
+                                    Text("提前提醒")
+                                        .foregroundStyle(Color.appTextPrimary)
+                                    Spacer()
+                                    Text("差 \(vm.notifyThreshold) 號")
+                                        .font(.system(size: 13, design: .monospaced))
+                                        .foregroundStyle(Color.appGreen)
+                                }
+                            }
+                        }
                     } header: {
-                        Text("提醒方式")
+                        Text("通知")
+                    }
+                    .listRowBackground(Color.appSurface)
+
+                    // MARK: 其他通知設定
+                    Section {
+                        Toggle(isOn: $vm.hapticEnabled) {
+                            Text("震動提示")
+                                .foregroundStyle(Color.appTextPrimary)
+                        }
+                        .tint(Color.appGreen)
+
+                        if !notificationService.isAuthorized {
+                            Button {
+                                Task { await notificationService.requestAuthorization() }
+                            } label: {
+                                Label("開啟通知權限", systemImage: "bell.badge.fill")
+                                    .foregroundStyle(Color.appGreen)
+                            }
+                        }
                     }
                     .listRowBackground(Color.appSurface)
 
@@ -123,7 +125,14 @@ struct SettingsView: View {
                 .listStyle(.insetGrouped)
                 .scrollContentBackground(.hidden)
             }
-            .navigationTitle("設定")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .principal) {
+                    Text("設定")
+                        .font(.system(size: 17, weight: .semibold))
+                        .foregroundStyle(Color.appTextPrimary)
+                }
+            }
             .alert("清除所有追蹤任務", isPresented: $showClearConfirm) {
                 Button("確定清除", role: .destructive) {
                     for task in trackingService.tasks {

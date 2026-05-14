@@ -16,15 +16,9 @@ struct HistoryView: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .principal) {
-                    HStack(spacing: 8) {
-                        Image("AppIconNav")
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: 30, height: 30)
-                        Text("我的看診紀錄")
-                            .font(.system(size: 18, weight: .semibold))
-                            .foregroundStyle(Color.appGreen)
-                    }
+                    Text("我的看診紀錄")
+                        .font(.system(size: 17, weight: .semibold))
+                        .foregroundStyle(Color.appTextPrimary)
                 }
             }
         }

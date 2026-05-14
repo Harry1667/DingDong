@@ -111,7 +111,7 @@ final class TrackingService: ObservableObject {
             print("[Tracking] stopTracking: 找不到任務 \(taskId)")
             return
         }
-        var task = tasks[idx]
+        let task = tasks[idx]
 
         notifications.cancelNotifications(for: taskId)
         saveRecord(task: task, reason: reason)
@@ -129,8 +129,6 @@ final class TrackingService: ObservableObject {
             }
         }
 
-        task.status = .cancelled
-        tasks[idx] = task
         tasks.remove(at: idx)
         persist()
     }
