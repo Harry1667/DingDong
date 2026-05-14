@@ -3,12 +3,16 @@ import SwiftUI
 struct HomeView: View {
     @EnvironmentObject var trackingService: TrackingService
     @EnvironmentObject var notificationService: NotificationService
+    @EnvironmentObject private var favoriteService: FavoriteService
     @StateObject private var vm: HomeViewModel
     @Environment(\.scenePhase) private var scenePhase
 
     @State private var glowPulse = false
     @State private var feedbackTask: TrackingTask?
     @State private var highlightedTaskId: UUID?
+    @State private var quickTrackItem: QuickTrackItem?
+    @State private var loadingFavoriteId: UUID?
+    @State private var noDataDoctorName: String?
 
     init() {
         _vm = StateObject(wrappedValue: HomeViewModel(trackingService: TrackingService.shared))
@@ -20,7 +24,7 @@ struct HomeView: View {
                 Color.appBackground.ignoresSafeArea()
                 ambientBackground
                 Group {
-                    if vm.tasks.isEmpty {
+                    if vm.tasks.isEmpty && favoriteService.favorites.isEmpty {
                         emptyState
                     } else {
                         taskList
@@ -56,6 +60,17 @@ struct HomeView: View {
             StopFeedbackSheet(task: task) { reason in
                 trackingService.stopTracking(taskId: task.id, reason: reason)
             }
+        }
+        .sheet(item: $quickTrackItem) { item in
+            TrackingSetupView(hospital: item.hospital, progress: item.progress)
+        }
+        .alert("今日無出診資料", isPresented: Binding(
+            get: { noDataDoctorName != nil },
+            set: { if !$0 { noDataDoctorName = nil } }
+        )) {
+            Button("確定", role: .cancel) {}
+        } message: {
+            Text("\(noDataDoctorName ?? "") 今日無看診資料，請明日再試")
         }
         .task {
             await notificationService.checkAuthorizationStatus()
@@ -105,11 +120,11 @@ struct HomeView: View {
                         }
                     }
 
+                    favoritesSection
+
                     if vm.tasks.count < TrackingService.maxTasks {
                         addButton
                     }
-
-                    historySection
                 }
                 .padding(.horizontal, 20)
                 .padding(.top, 8)
@@ -138,66 +153,78 @@ struct HomeView: View {
         }
     }
 
-    // MARK: - History
+    // MARK: - Favourites
 
     @ViewBuilder
-    private var historySection: some View {
-        let history = PersistenceService.shared.trackingHistory.suffix(5).reversed() as [TrackingRecord]
-        if !history.isEmpty {
+    private var favoritesSection: some View {
+        if !favoriteService.favorites.isEmpty {
             VStack(alignment: .leading, spacing: 10) {
-                Text("最近紀錄")
+                Text("常用醫師")
                     .font(.system(size: 12, weight: .semibold, design: .monospaced))
                     .foregroundStyle(Color.appTextSecondary)
                     .padding(.horizontal, 4)
-                ForEach(history) { record in
-                    historyCard(record)
+                ForEach(favoriteService.favorites) { fav in
+                    favoriteCard(fav)
                 }
             }
         }
     }
 
-    private func historyCard(_ record: TrackingRecord) -> some View {
-        HStack(spacing: 12) {
-            VStack(alignment: .leading, spacing: 3) {
-                Text(record.doctorName)
-                    .font(.system(size: 14, weight: .semibold))
+    private func favoriteCard(_ fav: FavoriteDoctor) -> some View {
+        HStack(spacing: 14) {
+            VStack(alignment: .leading, spacing: 4) {
+                Text(fav.doctorName)
+                    .font(.system(size: 15, weight: .semibold))
                     .foregroundStyle(Color.appTextPrimary)
-                Text("\(record.hospitalName) · \(record.clinicRoom)")
-                    .font(.system(size: 11, design: .monospaced))
+                Text("\(fav.hospitalName) · \(fav.clinicRoom)")
+                    .font(.system(size: 12, design: .monospaced))
                     .foregroundStyle(Color.appTextSecondary)
             }
             Spacer()
-            VStack(alignment: .trailing, spacing: 3) {
-                Text(historyReasonLabel(record.endReason))
-                    .font(.system(size: 11, weight: .medium))
-                    .foregroundStyle(historyReasonColor(record.endReason))
-                Text(record.date, style: .date)
-                    .font(.system(size: 10, design: .monospaced))
-                    .foregroundStyle(Color.appTextSecondary.opacity(0.7))
+            if loadingFavoriteId == fav.id {
+                ProgressView().tint(Color.appGreen)
+            } else {
+                Button {
+                    Task { await quickTrack(fav) }
+                } label: {
+                    Text("快速追蹤")
+                        .font(.system(size: 12, weight: .semibold))
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 6)
+                        .background(Color.appGreenLight)
+                        .foregroundStyle(Color.appGreen)
+                        .clipShape(Capsule())
+                }
+            }
+            Button {
+                favoriteService.remove(fav)
+            } label: {
+                Image(systemName: "star.slash")
+                    .font(.system(size: 14))
+                    .foregroundStyle(Color.appTextSecondary.opacity(0.4))
             }
         }
-        .padding(12)
-        .background(Color.appSurface.opacity(0.6))
-        .clipShape(RoundedRectangle(cornerRadius: 12))
-        .overlay(RoundedRectangle(cornerRadius: 12).stroke(Color.appBorder, lineWidth: 1))
+        .padding(14)
+        .background(Color.appSurface)
+        .clipShape(RoundedRectangle(cornerRadius: 14))
+        .overlay(RoundedRectangle(cornerRadius: 14).stroke(Color.appBorder, lineWidth: 1))
     }
 
-    private func historyReasonLabel(_ reason: String) -> String {
-        switch reason {
-        case "notified":  return "已叫號"
-        case "finished":  return "診已結束"
-        case "skipped":   return "已過號"
-        default:          return "已取消"
+    private func quickTrack(_ fav: FavoriteDoctor) async {
+        loadingFavoriteId = fav.id
+        defer { loadingFavoriteId = nil }
+        guard let response = try? await HospitalService.shared.fetchProgress(hospitalCode: fav.hospitalCode) else {
+            noDataDoctorName = fav.doctorName
+            return
         }
-    }
-
-    private func historyReasonColor(_ reason: String) -> Color {
-        switch reason {
-        case "notified": return Color.appGreen
-        case "finished": return Color.appTextSecondary
-        case "skipped":  return Color.appUrgency
-        default:         return Color.appTextSecondary.opacity(0.6)
+        guard let match = response.data.first(where: {
+            $0.doctorName == fav.doctorName && $0.clinicRoom == fav.clinicRoom
+        }) else {
+            noDataDoctorName = fav.doctorName
+            return
         }
+        let hospital = Hospital(code: fav.hospitalCode, name: fav.hospitalName)
+        quickTrackItem = QuickTrackItem(hospital: hospital, progress: match)
     }
 
     // MARK: - Scheduled card
@@ -312,4 +339,10 @@ struct HomeView: View {
         .ignoresSafeArea()
         .allowsHitTesting(false)
     }
+}
+
+private struct QuickTrackItem: Identifiable {
+    let id = UUID()
+    let hospital: Hospital
+    let progress: ClinicProgress
 }

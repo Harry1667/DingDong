@@ -14,8 +14,8 @@ struct ContentView: View {
                     .tabItem { Label("追蹤", systemImage: "bell.fill") }
                     .tag(0)
 
-                FavoritesView()
-                    .tabItem { Label("常用", systemImage: "star.fill") }
+                HistoryView()
+                    .tabItem { Label("我的紀錄", systemImage: "clock.arrow.circlepath") }
                     .tag(1)
 
                 SettingsView()
