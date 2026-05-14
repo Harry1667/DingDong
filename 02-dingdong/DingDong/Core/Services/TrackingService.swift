@@ -1,5 +1,6 @@
 import Foundation
 import Combine
+import WidgetKit
 
 @MainActor
 final class TrackingService: ObservableObject {
@@ -272,6 +273,7 @@ final class TrackingService: ObservableObject {
 
     private func persist() {
         persistence.trackingTasks = tasks
+        WidgetCenter.shared.reloadAllTimelines()
     }
 
     // 台灣看診時間：週一～六 07:00–21:00（週日不開診）

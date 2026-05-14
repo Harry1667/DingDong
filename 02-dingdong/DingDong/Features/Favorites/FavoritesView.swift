@@ -30,6 +30,12 @@ struct FavoritesView: View {
                             .foregroundStyle(Color.appGreen)
                     }
                 }
+                ToolbarItem(placement: .topBarTrailing) {
+                    NavigationLink(destination: HospitalListView()) {
+                        Image(systemName: "plus")
+                            .foregroundStyle(Color.appGreen)
+                    }
+                }
             }
         }
         .sheet(item: $quickTrackItem) { item in
