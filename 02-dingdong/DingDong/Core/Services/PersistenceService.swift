@@ -5,7 +5,7 @@ final class PersistenceService {
     static let shared = PersistenceService()
     private init() {}
 
-    private let defaults = UserDefaults.standard
+    private let defaults = UserDefaults(suiteName: "group.com.ajz.dingdong") ?? UserDefaults.standard
 
     // MARK: - Tracking Tasks
 
@@ -75,6 +75,41 @@ final class PersistenceService {
                 defaults.removeObject(forKey: "hospitals_cache_date")
             }
         }
+    }
+
+    // MARK: - Favourite Doctors
+
+    var favoriteDoctors: [FavoriteDoctor] {
+        get {
+            guard let data = defaults.data(forKey: "favorite_doctors"),
+                  let favs = try? JSONDecoder().decode([FavoriteDoctor].self, from: data) else { return [] }
+            return favs
+        }
+        set {
+            let data = try? JSONEncoder().encode(newValue)
+            defaults.set(data, forKey: "favorite_doctors")
+        }
+    }
+
+    func toggleFavorite(hospitalCode: String, hospitalName: String, department: String,
+                        doctorName: String, clinicRoom: String) {
+        var favs = favoriteDoctors
+        if let idx = favs.firstIndex(where: {
+            $0.hospitalCode == hospitalCode && $0.doctorName == doctorName && $0.clinicRoom == clinicRoom
+        }) {
+            favs.remove(at: idx)
+        } else {
+            favs.append(FavoriteDoctor(
+                id: UUID(), hospitalCode: hospitalCode, hospitalName: hospitalName,
+                department: department, doctorName: doctorName, clinicRoom: clinicRoom,
+                addedAt: Date()
+            ))
+        }
+        favoriteDoctors = favs
+    }
+
+    func removeFavorite(id: UUID) {
+        favoriteDoctors = favoriteDoctors.filter { $0.id != id }
     }
 
     // MARK: - Guest ID (Keychain)

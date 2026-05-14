@@ -26,9 +26,19 @@ struct HomeView: View {
                     }
                 }
             }
-            .navigationTitle("叮咚到號")
-            .navigationBarTitleDisplayMode(.large)
+            .navigationBarTitleDisplayMode(.inline)
             .toolbar {
+                ToolbarItem(placement: .principal) {
+                    HStack(spacing: 8) {
+                        Image("AppIconNav")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 30, height: 30)
+                        Text("叮咚到號")
+                            .font(.system(size: 18, weight: .semibold))
+                            .foregroundStyle(Color.appGreen)
+                    }
+                }
                 if !vm.tasks.isEmpty {
                     ToolbarItem(placement: .topBarTrailing) {
                         Button {
@@ -103,6 +113,8 @@ struct HomeView: View {
         }
         .refreshable { await trackingService.refreshAllTasks() }
     }
+
+    // MARK: - Scheduled card
 
     private func scheduledCard(task: TrackingTask) -> some View {
         HStack(spacing: 14) {

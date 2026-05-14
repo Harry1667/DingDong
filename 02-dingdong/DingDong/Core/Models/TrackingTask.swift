@@ -83,6 +83,11 @@ struct TrackStartResponse: Codable {
 struct TrackStopRequest: Encodable {
     let guestId: String
     let reason: String
+
+    enum CodingKeys: String, CodingKey {
+        case guestId = "guest_id"
+        case reason
+    }
 }
 
 struct TrackStopResponse: Codable {

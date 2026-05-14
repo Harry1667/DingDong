@@ -7,9 +7,11 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		027E24F2C24B4B6DDE0382AA /* FavoriteDoctor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6FEF483DB16D346227B6D1A4 /* FavoriteDoctor.swift */; };
 		0295A9E6CEE3EC3B2B7BCBB3 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B3DC59835551B2D9593CADD /* ContentView.swift */; };
 		035E34C0F3C34C6B01C03C0D /* PersistenceService.swift in Sources */ = {isa = PBXBuildFile; fileRef = D80A7DD95B61C69A496A963A /* PersistenceService.swift */; };
 		10359DC152A53390315F4E73 /* DingDongTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC7E047E7B21AF52774967EB /* DingDongTests.swift */; };
+		10F6F4F2A4BE320FAA419173 /* FavoriteService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 35E2B0D4FE92A3645B535640 /* FavoriteService.swift */; };
 		11A68C00BBA8CCC994149B15 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8977C0668638980EE823CF2B /* HomeView.swift */; };
 		120C2F1F36C149B6F43CA53E /* Department.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18487FFF1B81D0062D9A7341 /* Department.swift */; };
 		193CAFF5394D087EF694BDED /* TrackingWidgetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C02FACDE6E49EC17C1F66E97 /* TrackingWidgetView.swift */; };
@@ -38,6 +40,7 @@
 		8A91FE60AAC1AA55B25F3ACF /* TrackingDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EBA7080FD6BFE0E29676C6A /* TrackingDetailView.swift */; };
 		90A4E3925717726238E7344E /* WidgetBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27AF999C35C4C2DC01DA2C74 /* WidgetBundle.swift */; };
 		9266846490D8FE26ED5EAFF0 /* TrackingCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DD000E1AB14808509716D4C /* TrackingCardView.swift */; };
+		9A9C855FE88992515F4D95ED /* FavoritesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24A1F115DBA3B6EB83B6528F /* FavoritesView.swift */; };
 		A2FC1F60F7D7DFAC9804B6DB /* HospitalRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1967B99B92C5A21BC02E387 /* HospitalRowView.swift */; };
 		A444AC7347610448E111DD12 /* TrackingViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7603E460B0DB59FFA0586433 /* TrackingViewModel.swift */; };
 		AB4BA9E1B1CDB7831D2331D2 /* ClinicProgress.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0680433D2C4CED3B39A3C78B /* ClinicProgress.swift */; };
@@ -93,14 +96,17 @@
 		18487FFF1B81D0062D9A7341 /* Department.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Department.swift; sourceTree = "<group>"; };
 		1DF05B5BA47FF2CC2A568F73 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		2447A380B3A0D387F1B2D0B3 /* APIEndpoints.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIEndpoints.swift; sourceTree = "<group>"; };
+		24A1F115DBA3B6EB83B6528F /* FavoritesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FavoritesView.swift; sourceTree = "<group>"; };
 		27AF999C35C4C2DC01DA2C74 /* WidgetBundle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetBundle.swift; sourceTree = "<group>"; };
 		358A1ABF8AA601E685010907 /* DingDongApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DingDongApp.swift; sourceTree = "<group>"; };
+		35E2B0D4FE92A3645B535640 /* FavoriteService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FavoriteService.swift; sourceTree = "<group>"; };
 		3FC11CB931BA24BF7E1B12DE /* TrackingWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackingWidget.swift; sourceTree = "<group>"; };
 		4B402005068A9B86B875AD40 /* HospitalListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HospitalListView.swift; sourceTree = "<group>"; };
 		4D2A83542D370E305219121F /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		62F16FE7C17EFA1F8FB97670 /* BackgroundService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackgroundService.swift; sourceTree = "<group>"; };
 		64140CE06EA3624430388F6C /* DoctorProgressCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DoctorProgressCard.swift; sourceTree = "<group>"; };
 		6DDB66360F9109151128FE7F /* ProgressViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressViewModel.swift; sourceTree = "<group>"; };
+		6FEF483DB16D346227B6D1A4 /* FavoriteDoctor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FavoriteDoctor.swift; sourceTree = "<group>"; };
 		70C7661D853130DEAC475D03 /* DingDongWidget.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = DingDongWidget.entitlements; sourceTree = "<group>"; };
 		7603E460B0DB59FFA0586433 /* TrackingViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackingViewModel.swift; sourceTree = "<group>"; };
 		7E67FC69B6D4227F97DEC9C1 /* Color+App.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Color+App.swift"; sourceTree = "<group>"; };
@@ -197,6 +203,14 @@
 			path = DingDongWidget;
 			sourceTree = "<group>";
 		};
+		400430C116FF610CB940B59C /* Favorites */ = {
+			isa = PBXGroup;
+			children = (
+				24A1F115DBA3B6EB83B6528F /* FavoritesView.swift */,
+			);
+			path = Favorites;
+			sourceTree = "<group>";
+		};
 		523C592B3C67022B520386E8 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
@@ -222,6 +236,7 @@
 			children = (
 				0680433D2C4CED3B39A3C78B /* ClinicProgress.swift */,
 				18487FFF1B81D0062D9A7341 /* Department.swift */,
+				6FEF483DB16D346227B6D1A4 /* FavoriteDoctor.swift */,
 				C12E6606490CBBA463788A3E /* Hospital.swift */,
 				BFC74B270C11F1CCD2C83CFE /* TrackingTask.swift */,
 			);
@@ -231,6 +246,7 @@
 		74EAEFB99E0425DC1F029540 /* Features */ = {
 			isa = PBXGroup;
 			children = (
+				400430C116FF610CB940B59C /* Favorites */,
 				22584AD5D00DE054C30710AE /* Home */,
 				EE7AE4A18DD935C4A209F66F /* Hospital */,
 				C3358ACC4D6A41EC4527156E /* Onboarding */,
@@ -284,6 +300,7 @@
 			isa = PBXGroup;
 			children = (
 				62F16FE7C17EFA1F8FB97670 /* BackgroundService.swift */,
+				35E2B0D4FE92A3645B535640 /* FavoriteService.swift */,
 				9B5AFDC9C7D87F3351CFE393 /* HospitalService.swift */,
 				0EAD0FADD90CCE838645E05A /* NotificationService.swift */,
 				D80A7DD95B61C69A496A963A /* PersistenceService.swift */,
@@ -458,6 +475,9 @@
 				599B5644C42FD3561E9258DB /* DingDongApp.swift in Sources */,
 				DF38D6552DEDD8AEFB71D829 /* DoctorListView.swift in Sources */,
 				4533C90BECA4730B46577DCA /* DoctorProgressCard.swift in Sources */,
+				027E24F2C24B4B6DDE0382AA /* FavoriteDoctor.swift in Sources */,
+				10F6F4F2A4BE320FAA419173 /* FavoriteService.swift in Sources */,
+				9A9C855FE88992515F4D95ED /* FavoritesView.swift in Sources */,
 				11A68C00BBA8CCC994149B15 /* HomeView.swift in Sources */,
 				B8319335BC4CC95574B57025 /* HomeViewModel.swift in Sources */,
 				4A30F21818DF457E8DB95E57 /* Hospital.swift in Sources */,

@@ -9,7 +9,6 @@ final class HospitalViewModel: ObservableObject {
     @Published var errorMessage: String?
     @Published var searchText = ""
 
-    private var searchTask: Task<Void, Never>?
     private var cancellables = Set<AnyCancellable>()
 
     var groupedHospitals: [(area: HospitalArea, hospitals: [Hospital])] {
@@ -24,7 +23,6 @@ final class HospitalViewModel: ObservableObject {
 
     init() {
         $searchText
-            .debounce(for: .milliseconds(300), scheduler: DispatchQueue.main)
             .sink { [weak self] text in
                 self?.performSearch(text: text)
             }
@@ -33,31 +31,25 @@ final class HospitalViewModel: ObservableObject {
 
     func loadHospitals() async {
         guard allHospitals.isEmpty else { return }
+        await reload()
+    }
+
+    func reload() async {
         isLoading = true
+        errorMessage = nil
         defer { isLoading = false }
         do {
-            allHospitals = try await HospitalService.shared.fetchHospitals()
+            allHospitals = try await HospitalService.shared.fetchHospitals(forceRefresh: true)
         } catch {
             errorMessage = error.localizedDescription
         }
     }
 
     private func performSearch(text: String) {
-        searchTask?.cancel()
         guard !text.isEmpty else { searchResults = []; return }
-
-        searchTask = Task {
-            do {
-                try await Task.sleep(nanoseconds: 0)
-                let results = try await HospitalService.shared.searchHospitals(query: text)
-                guard !Task.isCancelled else { return }
-                searchResults = results
-            } catch {
-                if !Task.isCancelled {
-                    // 搜尋失敗時，從本地過濾
-                    searchResults = allHospitals.filter { $0.name.contains(text) }
-                }
-            }
+        searchResults = allHospitals.filter {
+            $0.name.localizedCaseInsensitiveContains(text) ||
+            ($0.shortName?.localizedCaseInsensitiveContains(text) ?? false)
         }
     }
 }

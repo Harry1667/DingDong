@@ -35,6 +35,7 @@ targets:
     entitlements:
       path: DingDong/DingDong.entitlements
       properties:
+        aps-environment: development
         com.apple.security.application-groups:
           - group.com.ajz.dingdong
     dependencies:

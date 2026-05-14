@@ -59,12 +59,22 @@ struct TrackingCardView: View {
 
                 Spacer()
 
-                Circle()
-                    .fill(isUrgent ? Color.appUrgency : Color.appGreenMid)
-                    .frame(width: 8, height: 8)
-                    .opacity(pulseOpacity)
-                    .animation(.easeInOut(duration: 1.8).repeatForever(autoreverses: true),
-                               value: pulseOpacity)
+                if !TrackingService.isOperatingHours() {
+                    Text("休診中")
+                        .font(.system(size: 10, weight: .medium, design: .monospaced))
+                        .padding(.horizontal, 7)
+                        .padding(.vertical, 3)
+                        .background(Color.appTextSecondary.opacity(0.10))
+                        .foregroundStyle(Color.appTextSecondary)
+                        .clipShape(Capsule())
+                } else {
+                    Circle()
+                        .fill(isUrgent ? Color.appUrgency : Color.appGreenMid)
+                        .frame(width: 8, height: 8)
+                        .opacity(pulseOpacity)
+                        .animation(.easeInOut(duration: 1.8).repeatForever(autoreverses: true),
+                                   value: pulseOpacity)
+                }
 
                 Button(action: onStop) {
                     Image(systemName: "xmark.circle.fill")

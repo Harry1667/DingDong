@@ -14,7 +14,7 @@ struct DoctorListView: View {
             ScrollView {
                 LazyVStack(spacing: 12) {
                     ForEach(progressVM.doctors(for: department)) { doctor in
-                        DoctorProgressCard(progress: doctor) {
+                        DoctorProgressCard(hospital: hospital, progress: doctor) {
                             selectedDoctor = doctor
                         }
                     }

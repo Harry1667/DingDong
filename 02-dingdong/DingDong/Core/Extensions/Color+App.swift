@@ -1,26 +1,32 @@
 import SwiftUI
 
 extension Color {
-    // MARK: - Brand
-    static let appGreen      = Color(hex: "#2D6A4F")   // 深森林綠 · accent / active
-    static let appGreenMid   = Color(hex: "#3DAB7A")   // 中綠 · 進度條
-    static let appGreenLight = Color(hex: "#2D6A4F").opacity(0.10)
+    // MARK: - Brand (fixed — same in both modes)
+    static let appGreen      = Color(hex: "#2D6A4F")
+    static let appGreenMid   = Color(hex: "#3DAB7A")
+    static let appGreenLight = Color(UIColor { t in
+        t.userInterfaceStyle == .dark
+            ? UIColor(red: 0.176, green: 0.416, blue: 0.31, alpha: 0.22)
+            : UIColor(red: 0.176, green: 0.416, blue: 0.31, alpha: 0.10)
+    })
+    static let appUrgency = Color(hex: "#E8A020")
 
-    // MARK: - Background & Surface
-    static let appBackground = Color(hex: "#F5F0E8")   // 奶油底
-    static let appSurface    = Color(hex: "#FDFAF4")   // 卡片
+    // MARK: - Adaptive backgrounds
+    static let appBackground = Color(UIColor.systemBackground)
+    static let appSurface    = Color(UIColor.secondarySystemBackground)
 
-    // MARK: - Text
-    static let appTextPrimary   = Color(hex: "#1C1A16") // 暖近黑
-    static let appTextSecondary = Color(hex: "#8C7E6A") // 暖灰
+    // MARK: - Adaptive text
+    static let appTextPrimary   = Color(UIColor.label)
+    static let appTextSecondary = Color(UIColor.secondaryLabel)
 
-    // MARK: - Urgency
-    static let appUrgency = Color(hex: "#E8A020")      // 琥珀金 · 差3號以內
+    // MARK: - Adaptive border
+    static let appBorder = Color(UIColor { t in
+        t.userInterfaceStyle == .dark
+            ? UIColor(white: 1.0, alpha: 0.10)
+            : UIColor(white: 0.0, alpha: 0.08)
+    })
 
-    // MARK: - Border / Shadow
-    static let appBorder = Color(hex: "#1C1A16").opacity(0.08)
-
-    // MARK: - Legacy alias (keeps existing call sites compiling)
+    // MARK: - Legacy alias
     static let cardBackground = Color.appSurface
 }
 

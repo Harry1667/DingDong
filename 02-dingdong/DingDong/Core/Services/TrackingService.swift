@@ -7,6 +7,7 @@ final class TrackingService: ObservableObject {
     private init() {
         tasks = PersistenceService.shared.trackingTasks
             .filter { !$0.isFinished }
+        print("[Tracking] 初始化，載入 \(tasks.count) 個任務")
         activateScheduledTasks()
         startPollingTimer()
     }
@@ -28,7 +29,9 @@ final class TrackingService: ObservableObject {
         threshold: Int,
         scheduledDate: Date? = nil
     ) async throws {
+        print("[Tracking] startTracking: \(progress.doctorName) @ \(hospital.name)")
         guard tasks.count < Self.maxTasks else {
+            print("[Tracking] 已達上限 \(Self.maxTasks) 個任務")
             throw TrackingError.maxTasksReached
         }
 
@@ -101,7 +104,10 @@ final class TrackingService: ObservableObject {
     // MARK: - 停止追蹤
 
     func stopTracking(taskId: UUID, reason: String = "cancelled") {
-        guard let idx = tasks.firstIndex(where: { $0.id == taskId }) else { return }
+        guard let idx = tasks.firstIndex(where: { $0.id == taskId }) else {
+            print("[Tracking] stopTracking: 找不到任務 \(taskId)")
+            return
+        }
         var task = tasks[idx]
 
         notifications.cancelNotifications(for: taskId)
@@ -160,33 +166,39 @@ final class TrackingService: ObservableObject {
     }
 
     private func poll(hospitalCode: String) async {
+        print("[Tracking] 查詢進度: \(hospitalCode)")
         guard let response = try? await APIClient.shared.get(
             APIEndpoints.progress(hospitalCode: hospitalCode)
-        ) as ProgressResponse else { return }
+        ) as ProgressResponse else {
+            print("[Tracking] 查詢失敗或無資料: \(hospitalCode)")
+            return
+        }
 
         for i in tasks.indices {
             guard tasks[i].hospitalCode == hospitalCode,
                   tasks[i].status == .active else { continue }
 
             let task = tasks[i]
-            let found = response.data.first {
+            guard let found = response.data.first(where: {
                 $0.doctorName == task.doctorName && $0.clinicRoom == task.clinicRoom
-            }
-
-            if found == nil {
-                tasks[i].status = .finished
-                tasks[i].lastUpdated = Date()
-                notifications.sendFinished(task: tasks[i])
-                removeFinished(taskId: task.id)
+            }) else {
+                if Self.isOperatingHours() {
+                    print("[Tracking] \(task.doctorName) 看診時間內查無資料，標記結束")
+                    tasks[i].status = .finished
+                    tasks[i].lastUpdated = Date()
+                    notifications.sendFinished(task: tasks[i])
+                    removeFinished(taskId: task.id)
+                }
                 continue
             }
 
-            let newNumber = found!.currentNumber
+            let newNumber = found.currentNumber
             guard newNumber != task.currentNumber else {
                 tasks[i].lastUpdated = Date()
                 continue
             }
 
+            print("[Tracking] \(task.doctorName) 叫號更新: \(task.currentNumber) → \(newNumber)")
             tasks[i].currentNumber = newNumber
             tasks[i].lastUpdated = Date()
             evaluateNotification(taskIndex: i)
@@ -260,6 +272,16 @@ final class TrackingService: ObservableObject {
 
     private func persist() {
         persistence.trackingTasks = tasks
+    }
+
+    // 台灣看診時間：週一～六 07:00–21:00（週日不開診）
+    static func isOperatingHours() -> Bool {
+        let cal = Calendar.current
+        let now = Date()
+        let hour    = cal.component(.hour,    from: now)
+        let weekday = cal.component(.weekday, from: now) // 1 = 週日
+        guard weekday != 1 else { return false }
+        return hour >= 7 && hour < 21
     }
 }
 

@@ -5,8 +5,7 @@ extension View {
         self
             .background(Color.appSurface)
             .clipShape(RoundedRectangle(cornerRadius: 16))
-            .shadow(color: Color(red: 0.545, green: 0.431, blue: 0.314).opacity(0.12),
-                    radius: 12, x: 0, y: 2)
+            .shadow(color: .black.opacity(0.10), radius: 12, x: 0, y: 2)
     }
 
     func loadingOverlay(_ isLoading: Bool) -> some View {

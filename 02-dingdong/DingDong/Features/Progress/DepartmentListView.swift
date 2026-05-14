@@ -69,14 +69,15 @@ struct DepartmentListView: View {
     }
 
     private var noDataView: some View {
-        VStack(spacing: 16) {
-            Image(systemName: "calendar.badge.exclamationmark")
+        let offHours = !TrackingService.isOperatingHours()
+        return VStack(spacing: 16) {
+            Image(systemName: offHours ? "moon.zzz" : "calendar.badge.exclamationmark")
                 .font(.system(size: 44))
                 .foregroundStyle(Color.appTextSecondary.opacity(0.4))
-            Text("今日無看診資料")
+            Text(offHours ? "目前非看診時間" : "今日無看診資料")
                 .font(.system(size: 17, weight: .semibold))
                 .foregroundStyle(Color.appTextPrimary)
-            Text("此醫院今日可能未開診，或資料尚未更新")
+            Text(offHours ? "看診時間為週一至週六 07:00–21:00\n請於開診後再查詢" : "此醫院今日可能未開診，或資料尚未更新")
                 .font(.system(size: 14))
                 .foregroundStyle(Color.appTextSecondary)
                 .multilineTextAlignment(.center)

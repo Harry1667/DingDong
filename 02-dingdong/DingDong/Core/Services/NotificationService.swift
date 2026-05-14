@@ -9,6 +9,7 @@ final class NotificationService: ObservableObject {
 
     @Published var isAuthorized = false
     @Published var apnsToken: String?
+    @Published var pendingDeepLinkTaskId: Int?
 
     func requestAuthorization() async {
         do {

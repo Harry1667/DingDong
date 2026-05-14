@@ -1,8 +1,17 @@
 import SwiftUI
 
 struct DoctorProgressCard: View {
+    let hospital: Hospital
     let progress: ClinicProgress
     let onTrack: () -> Void
+
+    @EnvironmentObject private var favoriteService: FavoriteService
+
+    private var isFav: Bool {
+        favoriteService.isFavorite(hospitalCode: hospital.code,
+                                   doctorName: progress.doctorName,
+                                   clinicRoom: progress.clinicRoom)
+    }
 
     var body: some View {
         HStack(alignment: .center, spacing: 16) {
@@ -39,6 +48,21 @@ struct DoctorProgressCard: View {
 
             Spacer()
 
+            Button {
+                favoriteService.toggle(
+                    hospitalCode: hospital.code,
+                    hospitalName: hospital.name,
+                    department: progress.department,
+                    doctorName: progress.doctorName,
+                    clinicRoom: progress.clinicRoom
+                )
+            } label: {
+                Image(systemName: isFav ? "star.fill" : "star")
+                    .font(.system(size: 18))
+                    .foregroundStyle(isFav ? Color.appUrgency : Color.appTextSecondary.opacity(0.4))
+            }
+            .padding(.trailing, 4)
+
             Button(action: onTrack) {
                 Text("追蹤")
                     .font(.system(size: 13, weight: .semibold))
@@ -52,21 +76,4 @@ struct DoctorProgressCard: View {
         .padding(16)
         .cardStyle()
     }
-}
-
-#Preview {
-    VStack(spacing: 12) {
-        DoctorProgressCard(
-            progress: ClinicProgress(department: "內科", doctorName: "王小明", clinicRoom: "診間 03",
-                                     currentNumber: 42, nextNumber: 43,
-                                     isCurrentSkipped: false, isNextSkipped: false)
-        ) {}
-        DoctorProgressCard(
-            progress: ClinicProgress(department: "外科", doctorName: "李大華", clinicRoom: "診間 07",
-                                     currentNumber: 18, nextNumber: 19,
-                                     isCurrentSkipped: true, isNextSkipped: false)
-        ) {}
-    }
-    .padding()
-    .background(Color.appBackground)
 }

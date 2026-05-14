@@ -18,7 +18,7 @@ actor HospitalService {
         let response: HospitalSearchResponse = try await APIClient.shared.get(
             APIEndpoints.searchHospital(query: query)
         )
-        return response.hospitals
+        return response.results
     }
 
     func fetchProgress(hospitalCode: String) async throws -> ProgressResponse {

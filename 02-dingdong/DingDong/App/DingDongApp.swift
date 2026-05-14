@@ -5,15 +5,17 @@ import UserNotifications
 @main
 struct DingDongApp: App {
     @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
-    @StateObject private var trackingService = TrackingService.shared
+    @StateObject private var trackingService    = TrackingService.shared
     @StateObject private var notificationService = NotificationService.shared
+    @StateObject private var favoriteService     = FavoriteService.shared
 
     var body: some Scene {
         WindowGroup {
             ContentView()
                 .environmentObject(trackingService)
                 .environmentObject(notificationService)
-                .background(Color.appBackground.ignoresSafeArea())
+                .environmentObject(favoriteService)
+                .background(Color(UIColor.systemBackground).ignoresSafeArea())
         }
     }
 }
@@ -49,10 +51,9 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
 
     func application(_ application: UIApplication,
                      didFailToRegisterForRemoteNotificationsWithError error: Error) {
-        // Simulator 上預期會失敗，真機才有效
+        // Expected on Simulator
     }
 
-    // 通知在前台也顯示
     func userNotificationCenter(
         _ center: UNUserNotificationCenter,
         willPresent notification: UNNotification,
@@ -61,12 +62,17 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
         completionHandler([.banner, .sound, .badge])
     }
 
-    // 點通知開啟 App
     func userNotificationCenter(
         _ center: UNUserNotificationCenter,
         didReceive response: UNNotificationResponse,
         withCompletionHandler completionHandler: @escaping () -> Void
     ) {
+        let userInfo = response.notification.request.content.userInfo
+        if let taskId = userInfo["task_id"] as? Int {
+            Task { @MainActor in
+                NotificationService.shared.pendingDeepLinkTaskId = taskId
+            }
+        }
         completionHandler()
     }
 }

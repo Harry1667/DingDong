@@ -47,7 +47,7 @@ struct SettingsView: View {
                         .pickerStyle(.segmented)
                         .listRowBackground(Color.appSurface)
 
-                        Text("更新越頻繁越省電越耗電；背景追蹤建議 30 秒")
+                        Text("越頻繁越耗電；背景追蹤建議 30 秒")
                             .font(.system(size: 12))
                             .foregroundStyle(Color.appTextSecondary)
                     }
