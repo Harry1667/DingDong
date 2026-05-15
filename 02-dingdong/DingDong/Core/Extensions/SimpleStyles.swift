@@ -304,36 +304,34 @@ struct SimpleGridCard: View {
     var nowNumber: Int? = nil             // 顯示「目前看到 N 號」橘框
     var nowEmptyText: String? = nil       // 沒號碼時的訊息（淺灰框）
     var minHeight: CGFloat = 112
-    let action: () -> Void
+    /// 保留供舊呼叫端傳空 closure；本 view 不再自帶點擊，由外層 NavigationLink/Button 控制。
+    var action: () -> Void = {}
 
     var body: some View {
-        Button(action: action) {
-            VStack(alignment: .leading, spacing: 4) {
-                titleBlock
-                if let subtitle, !subtitle.isEmpty {
-                    Text(subtitle)
-                        .font(.system(size: 15, weight: .semibold))
-                        .foregroundStyle(isClosed ? Color.appInk3 : Color.appInkSoft)
-                        .lineLimit(2)
-                        .padding(.top, 2)
-                }
-                if nowNumber != nil || nowEmptyText != nil {
-                    nowBox
-                        .padding(.top, 6)
-                }
-                Spacer(minLength: 0)
+        VStack(alignment: .leading, spacing: 4) {
+            titleBlock
+            if let subtitle, !subtitle.isEmpty {
+                Text(subtitle)
+                    .font(.system(size: 15, weight: .semibold))
+                    .foregroundStyle(isClosed ? Color.appInk3 : Color.appInkSoft)
+                    .lineLimit(2)
+                    .padding(.top, 2)
             }
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .frame(minHeight: minHeight, alignment: .topLeading)
-            .padding(14)
-            .opacity(isClosed ? 0.72 : 1)
+            if nowNumber != nil || nowEmptyText != nil {
+                nowBox
+                    .padding(.top, 6)
+            }
+            Spacer(minLength: 0)
         }
-        .buttonStyle(.plain)
-        .disabled(isClosed)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .frame(minHeight: minHeight, alignment: .topLeading)
+        .padding(14)
+        .opacity(isClosed ? 0.72 : 1)
+        .contentShape(Rectangle())
         .simpleCard(
             radius: 20,
             background: isClosed ? Color.appClosed : Color.appCard,
-            borderColor: isClosed ? Color.appBorder : Color.appBorder,
+            borderColor: Color.appBorder,
             borderWidth: 2.5
         )
     }

@@ -44,6 +44,17 @@ struct HospitalSearchResponse: Codable {
     let results: [Hospital]
 }
 
+// MARK: - 醫院休診狀態（/api/hospitals/status）
+
+struct HospitalStatusResponse: Codable {
+    let hospitals: [String: HospitalStatusEntry]
+}
+
+struct HospitalStatusEntry: Codable {
+    let open: Bool
+    let rooms: Int?
+}
+
 // 地區分類
 enum HospitalArea: String, CaseIterable {
     case taipei    = "台北市"

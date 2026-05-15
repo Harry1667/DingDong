@@ -5,6 +5,8 @@ struct SettingsView: View {
     @EnvironmentObject var notificationService: NotificationService
     @EnvironmentObject var trackingService: TrackingService
     @State private var showClearConfirm = false
+    @State private var showPaywall = false
+    @State private var tier: UserTier = PersistenceService.shared.userTier
 
     var body: some View {
         NavigationStack {
@@ -14,6 +16,7 @@ struct SettingsView: View {
                     header
                     ScrollView {
                         VStack(spacing: 14) {
+                            subscriptionCard
                             notifyModeCard
                             otherNotifyCard
                             refreshIntervalCard
@@ -38,8 +41,57 @@ struct SettingsView: View {
             } message: {
                 Text("所有進行中的追蹤將被停止，此操作無法復原")
             }
+            .sheet(isPresented: $showPaywall, onDismiss: {
+                tier = PersistenceService.shared.userTier
+            }) {
+                PaywallView()
+            }
         }
         .task { await notificationService.checkAuthorizationStatus() }
+    }
+
+    // MARK: ── 訂閱卡（最上方）──
+
+    private var subscriptionCard: some View {
+        Button { showPaywall = true } label: {
+            HStack(spacing: 14) {
+                ZStack {
+                    RoundedRectangle(cornerRadius: 14)
+                        .fill(
+                            LinearGradient(
+                                colors: tier == .paid
+                                    ? [Color.appOk, Color.appOkD2]
+                                    : [Color.appAccent, Color.appAccentD],
+                                startPoint: .top, endPoint: .bottom
+                            )
+                        )
+                        .frame(width: 50, height: 50)
+                    Image(systemName: tier == .paid ? "checkmark.seal.fill" : "sparkles")
+                        .font(.system(size: 22, weight: .heavy))
+                        .foregroundStyle(.white)
+                }
+                VStack(alignment: .leading, spacing: 3) {
+                    Text(tier == .paid ? "Pro 會員" : "升級為 Pro")
+                        .font(.system(size: 18, weight: .heavy))
+                        .foregroundStyle(Color.appInk)
+                    Text(tier == .paid
+                         ? "同時追 3 位醫生 · 永久看診紀錄"
+                         : "一次追 3 位醫生，看診不再錯過")
+                        .font(.system(size: 13, weight: .semibold))
+                        .foregroundStyle(Color.appInkSoft)
+                }
+                Spacer()
+                Image(systemName: "chevron.right")
+                    .font(.system(size: 14, weight: .heavy))
+                    .foregroundStyle(Color.appInk3)
+            }
+            .padding(14)
+            .frame(maxWidth: .infinity)
+            .simpleCard(radius: 16,
+                        borderColor: tier == .paid ? Color.appOk.opacity(0.4) : Color.appAccent.opacity(0.4),
+                        borderWidth: 2.5)
+        }
+        .buttonStyle(.plain)
     }
 
     private var header: some View {
@@ -112,6 +164,15 @@ struct SettingsView: View {
                         .foregroundStyle(Color.appInk)
                     Spacer()
                     Toggle("", isOn: $vm.hapticEnabled)
+                        .labelsHidden()
+                        .tint(Color.appAccent)
+                }
+                HStack {
+                    Text("音效提示")
+                        .font(.system(size: 15, weight: .heavy))
+                        .foregroundStyle(Color.appInk)
+                    Spacer()
+                    Toggle("", isOn: $vm.soundEnabled)
                         .labelsHidden()
                         .tint(Color.appAccent)
                 }

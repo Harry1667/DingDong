@@ -10,7 +10,7 @@ struct HospitalListView: View {
             totalSteps: 4,
             onBack: { dismiss() }
         ) { hospital in
-            DepartmentListView(hospital: hospital)
+            DepartmentListView(simple: hospital)
         }
         .onReceive(NotificationCenter.default.publisher(for: .didStartNewTracking)) { _ in
             dismiss()

@@ -48,16 +48,31 @@ struct HistoryView: View {
     }
 
     private var recordList: some View {
-        ScrollView {
-            VStack(spacing: 10) {
-                ForEach(records) { record in
-                    recordCard(record)
-                }
+        List {
+            ForEach(records) { record in
+                recordCard(record)
+                    .listRowBackground(Color.clear)
+                    .listRowSeparator(.hidden)
+                    .listRowInsets(EdgeInsets(top: 5, leading: 16, bottom: 5, trailing: 16))
+                    .swipeActions(edge: .trailing, allowsFullSwipe: true) {
+                        Button(role: .destructive) {
+                            deleteRecord(record)
+                        } label: {
+                            Label("刪除", systemImage: "trash")
+                        }
+                    }
             }
-            .padding(.horizontal, 16)
-            .padding(.top, 4)
-            .padding(.bottom, 32)
         }
+        .listStyle(.plain)
+        .scrollContentBackground(.hidden)
+        .background(Color.appBg)
+    }
+
+    private func deleteRecord(_ record: TrackingRecord) {
+        var all = PersistenceService.shared.trackingHistory
+        all.removeAll { $0.id == record.id }
+        PersistenceService.shared.trackingHistory = all
+        withAnimation { records.removeAll { $0.id == record.id } }
     }
 
     private func recordCard(_ record: TrackingRecord) -> some View {

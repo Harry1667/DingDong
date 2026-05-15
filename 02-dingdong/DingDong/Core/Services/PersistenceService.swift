@@ -23,6 +23,16 @@ final class PersistenceService {
         }
     }
 
+    // MARK: - 訂閱層級（對齊網頁 dd_tier）
+
+    var userTier: UserTier {
+        get {
+            let raw = defaults.string(forKey: "user_tier") ?? "free"
+            return UserTier(rawValue: raw) ?? .free
+        }
+        set { defaults.set(newValue.rawValue, forKey: "user_tier") }
+    }
+
     // MARK: - Settings
 
     var notifyThreshold: Int {

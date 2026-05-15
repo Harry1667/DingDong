@@ -4,33 +4,56 @@ struct DepartmentListView: View {
     @StateObject private var vm: ProgressViewModel
     @Environment(\.dismiss) private var dismiss
 
-    init(hospital: Hospital) {
-        _vm = StateObject(wrappedValue: ProgressViewModel(hospital: hospital))
+    let simple: SimpleHospital
+
+    init(simple: SimpleHospital) {
+        self.simple = simple
+        _vm = StateObject(wrappedValue: ProgressViewModel(hospital: simple.asHospital))
     }
 
-    private var allDepartments: [String] {
-        Array(Set(vm.progressData.map { $0.department })).sorted()
+    /// Scope 給 pickCount 用：tsgh:台北門 之類的子 scope 才不會三院區互相干擾
+    private var pickScope: String {
+        if let p = simple.branchPrefix, !p.isEmpty {
+            return "\(simple.code):\(p)"
+        }
+        return simple.code
     }
 
-    private var sortedDepartments: [(name: String, isClosed: Bool, picks: Int)] {
-        let active = Set(allDepartments)
-        return active.map { name in
-            let picks = PersistenceService.shared.pickCount(
-                kind: "dept",
-                scope: vm.hospital.code,
-                item: name
-            )
-            return (name: name, isClosed: false, picks: picks)
-        }.sorted { lhs, rhs in
-            if lhs.isClosed != rhs.isClosed { return !lhs.isClosed }
-            if lhs.picks != rhs.picks { return lhs.picks > rhs.picks }
-            return lhs.name < rhs.name
+    private struct DeptItem: Hashable {
+        let full: String
+        let display: String
+    }
+
+    private var rawDepartments: [String] {
+        Array(Set(vm.progressData.map { $0.department }))
+    }
+
+    /// 對齊 /simple/dept.html：若有 branch_prefix 則過濾 + 去前綴顯示
+    private var departments: [DeptItem] {
+        let prefix = simple.branchPrefix ?? ""
+        return rawDepartments.compactMap { name -> DeptItem? in
+            if prefix.isEmpty {
+                return DeptItem(full: name, display: name)
+            }
+            guard name.hasPrefix(prefix) else { return nil }
+            let trimmed = String(name.dropFirst(prefix.count))
+                .trimmingCharacters(in: .whitespaces)
+            return DeptItem(full: name, display: trimmed.isEmpty ? name : trimmed)
+        }
+    }
+
+    private var sortedDepartments: [DeptItem] {
+        departments.sorted { lhs, rhs in
+            let a = PersistenceService.shared.pickCount(kind: "dept", scope: pickScope, item: lhs.display)
+            let b = PersistenceService.shared.pickCount(kind: "dept", scope: pickScope, item: rhs.display)
+            if a != b { return a > b }
+            return lhs.display < rhs.display
         }
     }
 
     var body: some View {
         SimpleScreen {
-            SimpleTopBar(title: vm.hospital.name, onBack: { dismiss() })
+            SimpleTopBar(title: simple.fullName, onBack: { dismiss() })
             SimpleStepTitle(title: "您要看哪一科？", step: 2, total: 4)
         } content: {
             content
@@ -51,36 +74,31 @@ struct DepartmentListView: View {
             .frame(maxWidth: .infinity).padding(.top, 60)
         } else if let error = vm.errorMessage, vm.progressData.isEmpty {
             errorView(error)
-        } else if allDepartments.isEmpty {
+        } else if sortedDepartments.isEmpty {
             noDataView
         } else {
             SimpleTwoColGrid {
-                ForEach(sortedDepartments, id: \.name) { item in
-                    let picks = item.picks
+                ForEach(sortedDepartments, id: \.self) { item in
+                    let picks = PersistenceService.shared.pickCount(kind: "dept", scope: pickScope, item: item.display)
                     let star: String? = picks >= 3 ? "⭐" : (picks >= 1 ? "•" : nil)
                     NavigationLink {
                         DoctorListView(
-                            hospital: vm.hospital,
-                            department: item.name,
+                            hospital: simple.asHospital,
+                            department: item.full,
+                            departmentDisplay: item.display,
                             progressVM: vm
                         )
                         .onAppear {
-                            PersistenceService.shared.bumpPick(
-                                kind: "dept",
-                                scope: vm.hospital.code,
-                                item: item.name
-                            )
+                            PersistenceService.shared.bumpPick(kind: "dept", scope: pickScope, item: item.display)
                         }
                     } label: {
                         SimpleGridCard(
-                            title: item.name,
+                            title: item.display,
                             subtitle: nil,
-                            isClosed: item.isClosed,
+                            isClosed: false,
                             trailingMark: star,
-                            minHeight: 90,
-                            action: {}
+                            minHeight: 90
                         )
-                        .allowsHitTesting(false)
                     }
                     .buttonStyle(.plain)
                 }

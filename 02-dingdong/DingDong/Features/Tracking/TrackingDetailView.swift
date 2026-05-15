@@ -8,9 +8,29 @@ struct TrackingDetailView: View {
     @EnvironmentObject private var favoriteService: FavoriteService
     @Environment(\.dismiss) private var dismiss
     @State private var showStopSheet: TrackingTask?
+    @State private var lastCurrent: Int? = nil
 
     private var task: TrackingTask? {
         trackingService.tasks.first(where: { $0.id == taskId })
+    }
+
+    /// 偵測號碼變化播音效：警戒區 / 過號 → 叮咚；遠距離 → 單響
+    private func handleCurrentChange(_ newValue: Int?) {
+        guard let task,
+              let my = task.userNumber,
+              let cur = newValue, cur > 0 else { return }
+        let rem = my - cur
+        let inAlert = cur >= my              // 到號 / 過號
+        let inNear  = rem > 0 && rem <= 3     // 警戒區
+        let notable = inAlert || inNear
+
+        if lastCurrent == nil {
+            if notable { SoundService.shared.dingDong() }
+        } else if lastCurrent != cur {
+            if notable { SoundService.shared.dingDong() }
+            else       { SoundService.shared.ding() }
+        }
+        lastCurrent = cur
     }
 
     var body: some View {
@@ -50,6 +70,8 @@ struct TrackingDetailView: View {
                 dismiss()
             }
         }
+        .onAppear { handleCurrentChange(task?.currentNumber) }
+        .onChange(of: task?.currentNumber) { handleCurrentChange($0) }
     }
 
     // MARK: ── Top bar ────────────────────────────────────────

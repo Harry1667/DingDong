@@ -5,30 +5,41 @@ import SwiftUI
 struct HospitalPicker<Destination: View>: View {
     @StateObject private var vm = HospitalViewModel()
     @State private var selectedRegion: SimpleRegion = .north
-    @State private var pickBumpToken: UUID = UUID()   // 觸發 grid 重新讀取 pickCount
+    @State private var pickBumpToken: UUID = UUID()
 
     var title: String = "請選擇您要去的醫院"
     var stepIndex: Int? = 1
     var totalSteps: Int = 4
     var onBack: (() -> Void)? = nil
-    @ViewBuilder var destination: (Hospital) -> Destination
+    @ViewBuilder var destination: (SimpleHospital) -> Destination
+
+    private var expanded: [SimpleHospital] {
+        SimpleHospital.expand(vm.allHospitals)
+    }
 
     private var regionCounts: [SimpleRegion: Int] {
         var counts: [SimpleRegion: Int] = [:]
-        for h in vm.allHospitals {
+        for h in expanded {
             counts[h.simpleRegion, default: 0] += 1
         }
         return counts
     }
 
-    private var hospitalsInRegion: [Hospital] {
-        vm.allHospitals
+    private func isClosed(_ h: SimpleHospital) -> Bool {
+        guard let open = vm.hospitalStatus[h.code] else { return false }
+        return !open
+    }
+
+    private var hospitalsInRegion: [SimpleHospital] {
+        expanded
             .filter { $0.simpleRegion == selectedRegion }
             .sorted { lhs, rhs in
-                let a = PersistenceService.shared.pickCount(kind: "hospital", scope: lhs.code)
-                let b = PersistenceService.shared.pickCount(kind: "hospital", scope: rhs.code)
+                let lc = isClosed(lhs), rc = isClosed(rhs)
+                if lc != rc { return !lc }   // 開診先
+                let a = PersistenceService.shared.pickCount(kind: "hospital", scope: lhs.vid)
+                let b = PersistenceService.shared.pickCount(kind: "hospital", scope: rhs.vid)
                 if a != b { return a > b }
-                return lhs.name < rhs.name
+                return lhs.fullName < rhs.fullName
             }
     }
 
@@ -75,41 +86,96 @@ struct HospitalPicker<Destination: View>: View {
                             hospitalCard(hospital)
                         }
                     }
+                    tierStatusBar
+                        .padding(.top, 14)
                 }
             }
             .id(pickBumpToken)
         }
         .task { await vm.loadHospitals() }
+        .sheet(isPresented: $showPaywall, onDismiss: {
+            pickBumpToken = UUID()   // 訂閱狀態可能變了，重畫狀態列
+        }) {
+            PaywallView()
+        }
+    }
+
+    @State private var showPaywall = false
+
+    private var tierStatusBar: some View {
+        let tier = PersistenceService.shared.userTier
+        let active = TrackingService.shared.tasks.filter { !$0.isFinished }.count
+        return HStack(spacing: 12) {
+            HStack(spacing: 4) {
+                Text("追蹤中")
+                    .foregroundStyle(Color.appInk2)
+                Text("\(active)/\(tier.trackLimit)")
+                    .foregroundStyle(Color.appInk)
+                    .fontWeight(.heavy)
+            }
+            .font(.system(size: 14, weight: .semibold))
+            Spacer()
+            if tier == .free {
+                Button { showPaywall = true } label: {
+                    Text("升級 Pro 追 3 個")
+                        .font(.system(size: 13, weight: .heavy))
+                        .padding(.horizontal, 12).padding(.vertical, 6)
+                        .foregroundStyle(.white)
+                        .background(Color.appAccent)
+                        .clipShape(Capsule())
+                        .overlay(Capsule().stroke(Color.appAccentD, lineWidth: 1.5))
+                }
+                .buttonStyle(.plain)
+            } else {
+                Text("Pro")
+                    .font(.system(size: 12, weight: .heavy))
+                    .tracking(1)
+                    .padding(.horizontal, 10).padding(.vertical, 4)
+                    .foregroundStyle(.white)
+                    .background(Color.appOk)
+                    .clipShape(Capsule())
+            }
+        }
+        .padding(.horizontal, 14).padding(.vertical, 10)
+        .background(Color.appCard)
+        .clipShape(RoundedRectangle(cornerRadius: 14))
+        .overlay(RoundedRectangle(cornerRadius: 14).stroke(Color.appBorder, lineWidth: 2))
     }
 
     @ViewBuilder
-    private func hospitalCard(_ hospital: Hospital) -> some View {
-        let picks = PersistenceService.shared.pickCount(kind: "hospital", scope: hospital.code)
+    private func hospitalCard(_ hospital: SimpleHospital) -> some View {
+        let picks = PersistenceService.shared.pickCount(kind: "hospital", scope: hospital.vid)
         let star: String? = picks >= 3 ? "⭐" : (picks >= 1 ? "•" : nil)
-        let location: String? = {
-            if let c = hospital.city, let d = hospital.district { return "\(c) · \(d)" }
-            if let c = hospital.city { return c }
-            return nil
-        }()
+        let closed = isClosed(hospital)
 
-        NavigationLink {
-            destination(hospital)
-                .onAppear {
-                    PersistenceService.shared.bumpPick(kind: "hospital", scope: hospital.code)
-                }
-        } label: {
+        if closed {
             SimpleGridCard(
                 title: hospital.name,
-                branch: nil,
-                subtitle: location,
-                isClosed: false,
+                branch: hospital.branch,
+                subtitle: hospital.loc,
+                isClosed: true,
+                closedLabel: "休診中",
                 trailingMark: star,
-                minHeight: 112,
-                action: {}
+                minHeight: 112
             )
-            .allowsHitTesting(false)
+        } else {
+            NavigationLink {
+                destination(hospital)
+                    .onAppear {
+                        PersistenceService.shared.bumpPick(kind: "hospital", scope: hospital.vid)
+                    }
+            } label: {
+                SimpleGridCard(
+                    title: hospital.name,
+                    branch: hospital.branch,
+                    subtitle: hospital.loc,
+                    isClosed: false,
+                    trailingMark: star,
+                    minHeight: 112
+                )
+            }
+            .buttonStyle(.plain)
         }
-        .buttonStyle(.plain)
     }
 
     private func errorState(_ message: String) -> some View {

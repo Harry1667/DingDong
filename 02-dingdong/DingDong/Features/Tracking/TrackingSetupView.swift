@@ -162,6 +162,7 @@ struct TrackingSetupView: View {
                 style: .ok,
                 disabled: vm.userNumberText.isEmpty || vm.isLoading
             ) {
+                SoundService.shared.send()
                 Task { await vm.startTracking() }
             }
         }

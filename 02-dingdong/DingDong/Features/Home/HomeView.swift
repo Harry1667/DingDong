@@ -13,13 +13,30 @@ struct HomeView: View {
     @State private var loadingFavoriteId: UUID?
     @State private var noDataDoctorName: String?
     @State private var showAddFavorite = false
+    @State private var showPaywall = false
+    @State private var path = NavigationPath()   // push TrackingDetailView (UUID) / HospitalListView (String)
+
+    /// 達追蹤上限時是否該跳 paywall（免費版且 active+scheduled tasks 已滿）
+    private var shouldShowPaywallForNewTracking: Bool {
+        let tier = PersistenceService.shared.userTier
+        let count = trackingService.tasks.filter { !$0.isFinished }.count
+        return tier == .free && count >= tier.trackLimit
+    }
+
+    private func attemptAddTracking() {
+        if shouldShowPaywallForNewTracking {
+            showPaywall = true
+        } else {
+            path.append("addTracking")
+        }
+    }
 
     init() {
         _vm = StateObject(wrappedValue: HomeViewModel(trackingService: TrackingService.shared))
     }
 
     var body: some View {
-        NavigationStack {
+        NavigationStack(path: $path) {
             ZStack {
                 Color.appBg.ignoresSafeArea()
                 ScrollViewReader { proxy in
@@ -44,7 +61,24 @@ struct HomeView: View {
                 }
             }
             .navigationBarHidden(true)
+            .navigationDestination(for: UUID.self) { taskId in
+                TrackingDetailView(taskId: taskId)
+            }
+            .navigationDestination(for: String.self) { route in
+                if route == "addTracking" {
+                    HospitalListView()
+                }
+            }
         }
+        .onReceive(NotificationCenter.default.publisher(for: .didStartNewTracking)) { note in
+            guard let taskId = note.userInfo?["taskId"] as? UUID else { return }
+            // 等其他 sheet（TrackingSetupView）dismiss 完再 push；先清掉 HospitalListView 路徑
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.45) {
+                path = NavigationPath()
+                path.append(taskId)
+            }
+        }
+        .sheet(isPresented: $showPaywall) { PaywallView() }
         .sheet(item: $feedbackTask) { task in
             StopFeedbackSheet(task: task) { reason in
                 trackingService.stopTracking(taskId: task.id, reason: reason)
@@ -155,16 +189,15 @@ struct HomeView: View {
                         scheduledCard(task)
                     }
                 }
-                if vm.tasks.count < TrackingService.maxTasks {
-                    addTrackingCTA(isFirst: false)
-                        .padding(.top, 4)
-                }
+                // 「再追一位」永遠顯示；按下若已達上限會跳 paywall
+                addTrackingCTA(isFirst: false)
+                    .padding(.top, 4)
             }
         }
     }
 
     private func addTrackingCTA(isFirst: Bool) -> some View {
-        NavigationLink(destination: HospitalListView()) {
+        Button { attemptAddTracking() } label: {
             HStack(spacing: 14) {
                 Image(systemName: "plus.circle.fill")
                     .font(.system(size: 26, weight: .heavy))
@@ -370,6 +403,10 @@ struct HomeView: View {
     }
 
     private func quickTrack(_ fav: FavoriteDoctor) async {
+        if shouldShowPaywallForNewTracking {
+            showPaywall = true
+            return
+        }
         loadingFavoriteId = fav.id
         defer { loadingFavoriteId = nil }
         guard let response = try? await HospitalService.shared.fetchProgress(hospitalCode: fav.hospitalCode) else {

@@ -25,6 +25,19 @@ actor HospitalService {
         try await APIClient.shared.get(APIEndpoints.progress(hospitalCode: hospitalCode))
     }
 
+    /// 取得每間醫院當下「是否有任一科開診」的狀態（對齊網頁 /api/hospitals/status）。
+    /// 回傳 `[code: isOpen]`；任何錯誤都回空字典讓上層默默 fallback。
+    func fetchHospitalStatus() async -> [String: Bool] {
+        do {
+            let response: HospitalStatusResponse = try await APIClient.shared.get(
+                APIEndpoints.hospitalsStatus()
+            )
+            return response.hospitals.mapValues { $0.open }
+        } catch {
+            return [:]
+        }
+    }
+
     func fetchDepartments(hospitalCode: String) async throws -> [Department] {
         let response: DepartmentsResponse = try await APIClient.shared.get(
             APIEndpoints.departments(hospitalCode: hospitalCode)

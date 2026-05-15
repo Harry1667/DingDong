@@ -2,7 +2,8 @@ import SwiftUI
 
 struct DoctorListView: View {
     let hospital: Hospital
-    let department: String
+    let department: String           // 完整科別名（含 branch prefix，例「台北門眼科」）
+    let departmentDisplay: String    // 顯示用名（去前綴後，例「眼科」）
     @ObservedObject var progressVM: ProgressViewModel
     @Environment(\.dismiss) private var dismiss
 
@@ -10,6 +11,16 @@ struct DoctorListView: View {
     @State private var secondsUntilRefresh: Int = 30
     @State private var refreshTimer: Timer?
     @State private var skipToEnterTrigger: Bool = false
+
+    init(hospital: Hospital,
+         department: String,
+         departmentDisplay: String? = nil,
+         progressVM: ProgressViewModel) {
+        self.hospital = hospital
+        self.department = department
+        self.departmentDisplay = departmentDisplay ?? department
+        self.progressVM = progressVM
+    }
 
     private var doctors: [ClinicProgress] {
         progressVM.doctors(for: department)
@@ -21,7 +32,7 @@ struct DoctorListView: View {
             SimpleStepTitle(
                 title: "您找哪位醫生？",
                 step: 3, total: 4,
-                stepSuffix: department
+                stepSuffix: departmentDisplay
             )
         } content: {
             content
@@ -62,10 +73,8 @@ struct DoctorListView: View {
             trailingMark: nil,
             nowNumber: hasNumber ? doctor.currentNumber : nil,
             nowEmptyText: hasNumber ? nil : "尚未開始叫號",
-            minHeight: 150,
-            action: {}
+            minHeight: 150
         )
-        .allowsHitTesting(false)
     }
 
     // MARK: - Closed / waiting state
@@ -78,7 +87,7 @@ struct DoctorListView: View {
                 .foregroundStyle(Color.appInk)
             VStack(spacing: 4) {
                 Text(hospital.name)
-                Text(department)
+                Text(departmentDisplay)
                 Text("")
                 Text("診間尚未開始叫號")
                 Text("可能是尚未開診或剛結束")

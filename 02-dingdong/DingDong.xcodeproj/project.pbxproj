@@ -17,12 +17,14 @@
 		193CAFF5394D087EF694BDED /* TrackingWidgetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C02FACDE6E49EC17C1F66E97 /* TrackingWidgetView.swift */; };
 		1CBF318A00E9EB7E5D13982A /* SettingsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8E045F00E425736EE91FD40 /* SettingsViewModel.swift */; };
 		1D19092BD2CBA0BA30EE76F0 /* Color+App.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E67FC69B6D4227F97DEC9C1 /* Color+App.swift */; };
+		20A1D3A411A8A5D65DF98878 /* PaywallView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1AEE7E2535BB26B8E8D0C9E /* PaywallView.swift */; };
 		229701DFF7C089E68981E3D8 /* View+Modifiers.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4B84451F2E25040BEC62415 /* View+Modifiers.swift */; };
 		2353B86E18744DBC207598B9 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D2A9DBBB5A332D648D53A77B /* Assets.xcassets */; };
 		23F0DC06EF8D392950CBBE8A /* PrivacyPolicyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E8AA23046811C6F8B26060A /* PrivacyPolicyView.swift */; };
 		34F71EC38CE759CDE58F827D /* StopFeedbackSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0B8F60EEA6E1F241194A892 /* StopFeedbackSheet.swift */; };
 		3BEFBEDD5999C60C694ABA48 /* TrackingWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3FC11CB931BA24BF7E1B12DE /* TrackingWidget.swift */; };
 		3F6E3AED07A5D2F5349329AB /* NetworkError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F6DD637326164791BE97FC8 /* NetworkError.swift */; };
+		40DCCFDFD2673053B12001D4 /* SoundService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69C6156C53814C77F98B446D /* SoundService.swift */; };
 		424B8C7B06B89385F811EF02 /* Date+Format.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAC46440727540EE551EBFBF /* Date+Format.swift */; };
 		465296E3AC7530E628F3C950 /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B470972D9592DD02022AE88D /* OnboardingView.swift */; };
 		4A30F21818DF457E8DB95E57 /* Hospital.swift in Sources */ = {isa = PBXBuildFile; fileRef = C12E6606490CBBA463788A3E /* Hospital.swift */; };
@@ -47,9 +49,11 @@
 		AB4BA9E1B1CDB7831D2331D2 /* ClinicProgress.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0680433D2C4CED3B39A3C78B /* ClinicProgress.swift */; };
 		AF54D010B64396AAC00AB120 /* SimpleStyles.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5BB1708523DED5C8220C705 /* SimpleStyles.swift */; };
 		B388E6B8345FE02BEF8AEB24 /* APIClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB3159CF9817B9F2D796E16D /* APIClient.swift */; };
+		B822E7D0095EB0773E6A9A8C /* UserTier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 70675078EFA49A720EFDAA61 /* UserTier.swift */; };
 		B8319335BC4CC95574B57025 /* HomeViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = EC6B3BDDB738C55C76BB904D /* HomeViewModel.swift */; };
 		BADBEAC401BC5EBA4A77B687 /* DingDongWidget.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = E8244940C886712205A84E78 /* DingDongWidget.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		C2CC8CB3D34581EB71E279F2 /* TrackingWidgetEntry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1483446407A15BDA837C8D61 /* TrackingWidgetEntry.swift */; };
+		D010914CA221F79829DBAEF8 /* SimpleHospital.swift in Sources */ = {isa = PBXBuildFile; fileRef = 123CA66ACCBB88B2E8568CDB /* SimpleHospital.swift */; };
 		D02D61A0ACD297DA685C0FDA /* HospitalPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = C33FA65D58EEC0E5122AF4DE /* HospitalPicker.swift */; };
 		D1933A3AE79B724D7DDEF7A1 /* HospitalViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B00DD0FD4633AE71127B76C1 /* HospitalViewModel.swift */; };
 		D9C0762DD8A5C7522856BC07 /* ProgressViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DDB66360F9109151128FE7F /* ProgressViewModel.swift */; };
@@ -95,6 +99,7 @@
 		0B3DC59835551B2D9593CADD /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		0EAD0FADD90CCE838645E05A /* NotificationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationService.swift; sourceTree = "<group>"; };
 		109744E674F69704C64F5E31 /* TrackingService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackingService.swift; sourceTree = "<group>"; };
+		123CA66ACCBB88B2E8568CDB /* SimpleHospital.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SimpleHospital.swift; sourceTree = "<group>"; };
 		1483446407A15BDA837C8D61 /* TrackingWidgetEntry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackingWidgetEntry.swift; sourceTree = "<group>"; };
 		18487FFF1B81D0062D9A7341 /* Department.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Department.swift; sourceTree = "<group>"; };
 		1DF05B5BA47FF2CC2A568F73 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
@@ -109,9 +114,11 @@
 		4D2A83542D370E305219121F /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		62F16FE7C17EFA1F8FB97670 /* BackgroundService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackgroundService.swift; sourceTree = "<group>"; };
 		63760CE6C26111CA8EE09608 /* AddFavoriteBrowserSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddFavoriteBrowserSheet.swift; sourceTree = "<group>"; };
+		69C6156C53814C77F98B446D /* SoundService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SoundService.swift; sourceTree = "<group>"; };
 		6A5C57C897CC4EBB86707BB3 /* TrackingRecord.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackingRecord.swift; sourceTree = "<group>"; };
 		6DDB66360F9109151128FE7F /* ProgressViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressViewModel.swift; sourceTree = "<group>"; };
 		6FEF483DB16D346227B6D1A4 /* FavoriteDoctor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FavoriteDoctor.swift; sourceTree = "<group>"; };
+		70675078EFA49A720EFDAA61 /* UserTier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserTier.swift; sourceTree = "<group>"; };
 		70C7661D853130DEAC475D03 /* DingDongWidget.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = DingDongWidget.entitlements; sourceTree = "<group>"; };
 		7603E460B0DB59FFA0586433 /* TrackingViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackingViewModel.swift; sourceTree = "<group>"; };
 		7E67FC69B6D4227F97DEC9C1 /* Color+App.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Color+App.swift"; sourceTree = "<group>"; };
@@ -134,12 +141,13 @@
 		C0B8F60EEA6E1F241194A892 /* StopFeedbackSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StopFeedbackSheet.swift; sourceTree = "<group>"; };
 		C12E6606490CBBA463788A3E /* Hospital.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Hospital.swift; sourceTree = "<group>"; };
 		C33FA65D58EEC0E5122AF4DE /* HospitalPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HospitalPicker.swift; sourceTree = "<group>"; };
+		D1AEE7E2535BB26B8E8D0C9E /* PaywallView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaywallView.swift; sourceTree = "<group>"; };
 		D2A9DBBB5A332D648D53A77B /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		D80A7DD95B61C69A496A963A /* PersistenceService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersistenceService.swift; sourceTree = "<group>"; };
 		DC7E047E7B21AF52774967EB /* DingDongTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DingDongTests.swift; sourceTree = "<group>"; };
-		DFBE68C736188A02826266E0 /* DingDong.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = DingDong.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		DFBE68C736188A02826266E0 /* DingDong.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DingDong.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E5BB1708523DED5C8220C705 /* SimpleStyles.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SimpleStyles.swift; sourceTree = "<group>"; };
-		E8244940C886712205A84E78 /* DingDongWidget.appex */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = "wrapper.app-extension"; path = DingDongWidget.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		E8244940C886712205A84E78 /* DingDongWidget.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = DingDongWidget.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		EC6B3BDDB738C55C76BB904D /* HomeViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeViewModel.swift; sourceTree = "<group>"; };
 		FAC46440727540EE551EBFBF /* Date+Format.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Date+Format.swift"; sourceTree = "<group>"; };
 		FEE9A4D620F76740487EA801 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
@@ -218,6 +226,14 @@
 			path = Favorites;
 			sourceTree = "<group>";
 		};
+		42A36DC9CC89E34C7EC89D22 /* Paywall */ = {
+			isa = PBXGroup;
+			children = (
+				D1AEE7E2535BB26B8E8D0C9E /* PaywallView.swift */,
+			);
+			path = Paywall;
+			sourceTree = "<group>";
+		};
 		523C592B3C67022B520386E8 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
@@ -245,8 +261,10 @@
 				18487FFF1B81D0062D9A7341 /* Department.swift */,
 				6FEF483DB16D346227B6D1A4 /* FavoriteDoctor.swift */,
 				C12E6606490CBBA463788A3E /* Hospital.swift */,
+				123CA66ACCBB88B2E8568CDB /* SimpleHospital.swift */,
 				6A5C57C897CC4EBB86707BB3 /* TrackingRecord.swift */,
 				BFC74B270C11F1CCD2C83CFE /* TrackingTask.swift */,
+				70675078EFA49A720EFDAA61 /* UserTier.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -258,6 +276,7 @@
 				22584AD5D00DE054C30710AE /* Home */,
 				EE7AE4A18DD935C4A209F66F /* Hospital */,
 				C3358ACC4D6A41EC4527156E /* Onboarding */,
+				42A36DC9CC89E34C7EC89D22 /* Paywall */,
 				791E40AAA23327F90DDB601C /* Progress */,
 				CA6E7C6527F318206C8935C3 /* Settings */,
 				04695C87DC5AFF156AAAF2B5 /* Tracking */,
@@ -311,6 +330,7 @@
 				9B5AFDC9C7D87F3351CFE393 /* HospitalService.swift */,
 				0EAD0FADD90CCE838645E05A /* NotificationService.swift */,
 				D80A7DD95B61C69A496A963A /* PersistenceService.swift */,
+				69C6156C53814C77F98B446D /* SoundService.swift */,
 				109744E674F69704C64F5E31 /* TrackingService.swift */,
 			);
 			path = Services;
@@ -427,12 +447,6 @@
 					333126FF0AE2FB08FEC4861F = {
 						DevelopmentTeam = "";
 					};
-					90992014731336976464595F = {
-						DevelopmentTeam = "";
-					};
-					E440C0070A6136F0B22F326E = {
-						DevelopmentTeam = "";
-					};
 				};
 			};
 			buildConfigurationList = 2931F781BEA970B881E2D867 /* Build configuration list for PBXProject "DingDong" */;
@@ -497,12 +511,15 @@
 				3F6E3AED07A5D2F5349329AB /* NetworkError.swift in Sources */,
 				704AC4751259C50E2455033A /* NotificationService.swift in Sources */,
 				465296E3AC7530E628F3C950 /* OnboardingView.swift in Sources */,
+				20A1D3A411A8A5D65DF98878 /* PaywallView.swift in Sources */,
 				035E34C0F3C34C6B01C03C0D /* PersistenceService.swift in Sources */,
 				23F0DC06EF8D392950CBBE8A /* PrivacyPolicyView.swift in Sources */,
 				D9C0762DD8A5C7522856BC07 /* ProgressViewModel.swift in Sources */,
 				5E283EB1E484B678099B24A5 /* SettingsView.swift in Sources */,
 				1CBF318A00E9EB7E5D13982A /* SettingsViewModel.swift in Sources */,
+				D010914CA221F79829DBAEF8 /* SimpleHospital.swift in Sources */,
 				AF54D010B64396AAC00AB120 /* SimpleStyles.swift in Sources */,
+				40DCCFDFD2673053B12001D4 /* SoundService.swift in Sources */,
 				34F71EC38CE759CDE58F827D /* StopFeedbackSheet.swift in Sources */,
 				9266846490D8FE26ED5EAFF0 /* TrackingCardView.swift in Sources */,
 				8A91FE60AAC1AA55B25F3ACF /* TrackingDetailView.swift in Sources */,
@@ -511,6 +528,7 @@
 				F82B3B452B20DD8EDDC72FA9 /* TrackingSetupView.swift in Sources */,
 				82B5CD09466EEFC59777BDEA /* TrackingTask.swift in Sources */,
 				A444AC7347610448E111DD12 /* TrackingViewModel.swift in Sources */,
+				B822E7D0095EB0773E6A9A8C /* UserTier.swift in Sources */,
 				229701DFF7C089E68981E3D8 /* View+Modifiers.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -573,6 +591,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = DingDongWidget/DingDongWidget.entitlements;
+				DEVELOPMENT_TEAM = Q377MM9X45;
 				INFOPLIST_FILE = DingDongWidget/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -673,6 +692,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = DingDongWidget/DingDongWidget.entitlements;
+				DEVELOPMENT_TEAM = Q377MM9X45;
 				INFOPLIST_FILE = DingDongWidget/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -751,14 +771,19 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = DingDong/DingDong.entitlements;
-				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 2;
+				DEVELOPMENT_TEAM = Q377MM9X45;
 				INFOPLIST_FILE = DingDong/Resources/Info.plist;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.healthcare-fitness";
 				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.ajz.dingdong;
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = 1;
 			};
@@ -770,14 +795,19 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = DingDong/DingDong.entitlements;
-				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 2;
+				DEVELOPMENT_TEAM = Q377MM9X45;
 				INFOPLIST_FILE = DingDong/Resources/Info.plist;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.healthcare-fitness";
 				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.ajz.dingdong;
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = 1;
 			};

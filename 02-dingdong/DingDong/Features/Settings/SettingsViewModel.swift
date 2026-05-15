@@ -17,6 +17,9 @@ final class SettingsViewModel: ObservableObject {
     @Published var hapticEnabled: Bool {
         didSet { PersistenceService.shared.hapticEnabled = hapticEnabled }
     }
+    @Published var soundEnabled: Bool {
+        didSet { SoundService.shared.isEnabled = soundEnabled }
+    }
 
     init() {
         let p = PersistenceService.shared
@@ -24,5 +27,6 @@ final class SettingsViewModel: ObservableObject {
         notifyMode      = p.notifyMode
         refreshInterval = p.refreshInterval
         hapticEnabled   = p.hapticEnabled
+        soundEnabled    = SoundService.shared.isEnabled
     }
 }

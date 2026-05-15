@@ -10,7 +10,7 @@ struct AddFavoriteBrowserSheet: View {
                 stepIndex: nil,
                 onBack: { dismiss() }
             ) { hospital in
-                FavoriteDeptPickerView(hospital: hospital)
+                FavoriteDeptPickerView(simple: hospital)
             }
         }
     }
@@ -19,22 +19,38 @@ struct AddFavoriteBrowserSheet: View {
 // MARK: - Department picker (favorites flow)
 
 private struct FavoriteDeptPickerView: View {
-    let hospital: Hospital
+    let simple: SimpleHospital
     @StateObject private var vm: ProgressViewModel
     @Environment(\.dismiss) private var dismiss
 
-    init(hospital: Hospital) {
-        self.hospital = hospital
-        _vm = StateObject(wrappedValue: ProgressViewModel(hospital: hospital))
+    init(simple: SimpleHospital) {
+        self.simple = simple
+        _vm = StateObject(wrappedValue: ProgressViewModel(hospital: simple.asHospital))
     }
 
-    private var allDepartments: [String] {
-        Array(Set(vm.progressData.map { $0.department })).sorted()
+    private struct DeptItem: Hashable {
+        let full: String
+        let display: String
+    }
+
+    private var allDepartments: [DeptItem] {
+        let raws = Array(Set(vm.progressData.map { $0.department }))
+        let prefix = simple.branchPrefix ?? ""
+        let items: [DeptItem] = raws.compactMap { name in
+            if prefix.isEmpty {
+                return DeptItem(full: name, display: name)
+            }
+            guard name.hasPrefix(prefix) else { return nil }
+            let trimmed = String(name.dropFirst(prefix.count))
+                .trimmingCharacters(in: .whitespaces)
+            return DeptItem(full: name, display: trimmed.isEmpty ? name : trimmed)
+        }
+        return items.sorted { $0.display < $1.display }
     }
 
     var body: some View {
         SimpleScreen {
-            SimpleTopBar(title: hospital.name, onBack: { dismiss() })
+            SimpleTopBar(title: simple.fullName, onBack: { dismiss() })
             Text("選擇科別")
                 .font(.system(size: 22, weight: .heavy))
                 .tracking(-0.3)
@@ -64,18 +80,17 @@ private struct FavoriteDeptPickerView: View {
                 ForEach(allDepartments, id: \.self) { dept in
                     NavigationLink {
                         FavoriteDoctorListView(
-                            hospital: hospital,
-                            department: dept,
+                            hospital: simple.asHospital,
+                            department: dept.full,
+                            departmentDisplay: dept.display,
                             progressVM: vm
                         )
                     } label: {
                         SimpleGridCard(
-                            title: dept,
+                            title: dept.display,
                             isClosed: false,
-                            minHeight: 90,
-                            action: {}
+                            minHeight: 90
                         )
-                        .allowsHitTesting(false)
                     }
                     .buttonStyle(.plain)
                 }
@@ -89,11 +104,22 @@ private struct FavoriteDeptPickerView: View {
 
 private struct FavoriteDoctorListView: View {
     let hospital: Hospital
-    let department: String
+    let department: String              // 完整科別名（含 branch prefix）
+    let departmentDisplay: String       // 顯示用名（去前綴）
     @ObservedObject var progressVM: ProgressViewModel
     @EnvironmentObject private var favoriteService: FavoriteService
     @Environment(\.dismiss) private var dismiss
     @State private var addedId: String?
+
+    init(hospital: Hospital,
+         department: String,
+         departmentDisplay: String? = nil,
+         progressVM: ProgressViewModel) {
+        self.hospital = hospital
+        self.department = department
+        self.departmentDisplay = departmentDisplay ?? department
+        self.progressVM = progressVM
+    }
 
     private var doctors: [ClinicProgress] {
         progressVM.doctors(for: department)
@@ -102,7 +128,7 @@ private struct FavoriteDoctorListView: View {
     var body: some View {
         SimpleScreen {
             SimpleTopBar(title: hospital.name, onBack: { dismiss() })
-            Text(department)
+            Text(departmentDisplay)
                 .font(.system(size: 22, weight: .heavy))
                 .tracking(-0.3)
                 .frame(maxWidth: .infinity, alignment: .leading)

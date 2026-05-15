@@ -13,7 +13,8 @@ final class TrackingService: ObservableObject {
         startPollingTimer()
     }
 
-    static let maxTasks = 3
+    /// 同時追蹤上限（依使用者訂閱層級動態變更：free=1 / paid=3）
+    static var maxTasks: Int { PersistenceService.shared.userTier.trackLimit }
 
     @Published private(set) var tasks: [TrackingTask] = []
 
@@ -23,13 +24,14 @@ final class TrackingService: ObservableObject {
 
     // MARK: - 新增追蹤
 
+    @discardableResult
     func startTracking(
         hospital: Hospital,
         progress: ClinicProgress,
         userNumber: Int?,
         threshold: Int,
         scheduledDate: Date? = nil
-    ) async throws {
+    ) async throws -> UUID {
         print("[Tracking] startTracking: \(progress.doctorName) @ \(hospital.name)")
         guard tasks.count < Self.maxTasks else {
             print("[Tracking] 已達上限 \(Self.maxTasks) 個任務")
@@ -76,7 +78,7 @@ final class TrackingService: ObservableObject {
         tasks.append(newTask)
         persist()
 
-        guard !isFuture else { return }
+        guard !isFuture else { return task.id }
 
         let capturedToken = NotificationService.shared.apnsToken
         Task.detached(priority: .background) { [task, capturedToken] in
@@ -102,6 +104,7 @@ final class TrackingService: ObservableObject {
                 }
             }
         }
+        return task.id
     }
 
     // MARK: - 停止追蹤

@@ -7,6 +7,10 @@ enum APIEndpoints {
         "\(baseURL)/api/hospitals"
     }
 
+    static func hospitalsStatus() -> String {
+        "\(baseURL)/api/hospitals/status"
+    }
+
     static func progress(hospitalCode: String) -> String {
         "\(baseURL)/api/progress/\(hospitalCode)"
     }

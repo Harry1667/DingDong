@@ -43,14 +43,18 @@ final class TrackingViewModel: ObservableObject {
         defer { isLoading = false }
 
         do {
-            try await TrackingService.shared.startTracking(
+            let newTaskId = try await TrackingService.shared.startTracking(
                 hospital: hospital,
                 progress: progress,
                 userNumber: userNumber,
                 threshold: threshold,
                 scheduledDate: effectiveScheduledDate
             )
-            NotificationCenter.default.post(name: .didStartNewTracking, object: nil)
+            NotificationCenter.default.post(
+                name: .didStartNewTracking,
+                object: nil,
+                userInfo: ["taskId": newTaskId]
+            )
             didStartTracking = true
         } catch {
             errorMessage = error.localizedDescription
