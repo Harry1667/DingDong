@@ -267,43 +267,48 @@ struct TrackingDetailView: View {
             (.registered, "已登錄", "checkmark"),
             (.seeing,     "看診中", "person.fill"),
             (.near,       "快到您", "bell.fill"),
-            (.passed,     "已過號", "exclamationmark.triangle.fill")
+            (.passed,     "已過號", "flag.fill")
         ]
         let fill = CGFloat(min(max(active, 0), 3)) / 3.0
-        return VStack(spacing: 8) {
-            ZStack(alignment: .leading) {
-                GeometryReader { geo in
-                    ZStack(alignment: .leading) {
-                        Rectangle()
-                            .fill(Color.appBorder)
-                            .frame(height: 5)
-                            .padding(.horizontal, geo.size.width * 0.10)
-                        Rectangle()
-                            .fill(
-                                LinearGradient(
-                                    colors: active == 3
-                                        ? [Color.appAccent, Color.appDanger]
-                                        : [Color.appAccentD, Color.appAccent],
-                                    startPoint: .leading, endPoint: .trailing
-                                )
-                            )
-                            .frame(width: max(0, (geo.size.width * 0.80) * fill), height: 5)
-                            .offset(x: geo.size.width * 0.10)
-                            .animation(.spring(response: 0.6, dampingFraction: 0.85), value: fill)
-                    }
-                }
-                .frame(height: 5)
-                .offset(y: 22)
+        let iconBox: CGFloat = 56                      // 所有 icon 共用的固定高度
+        let lineY: CGFloat = iconBox / 2 - 2.5         // 線中心對齊 icon 中心
 
-                HStack(spacing: 0) {
-                    ForEach(Array(steps.enumerated()), id: \.offset) { idx, s in
-                        progressStepIcon(
-                            label: s.label,
-                            system: s.system,
-                            state: stepState(idx: idx, active: active)
+        return ZStack(alignment: .top) {
+            // 連接線：水平 12.5%–87.5%，剛好接到第一個與最後一個 icon 中心
+            GeometryReader { geo in
+                let inset = geo.size.width * 0.125
+                let trackWidth = geo.size.width * 0.75
+                ZStack(alignment: .leading) {
+                    Capsule()
+                        .fill(Color.appBorder)
+                        .frame(width: trackWidth, height: 5)
+                        .offset(x: inset)
+                    Capsule()
+                        .fill(
+                            LinearGradient(
+                                colors: active == 3
+                                    ? [Color.appAccent, Color.appDanger]
+                                    : [Color.appAccentD, Color.appAccent],
+                                startPoint: .leading, endPoint: .trailing
+                            )
                         )
-                        .frame(maxWidth: .infinity)
-                    }
+                        .frame(width: max(0, trackWidth * fill), height: 5)
+                        .offset(x: inset)
+                        .animation(.spring(response: 0.6, dampingFraction: 0.85), value: fill)
+                }
+            }
+            .frame(height: 5)
+            .padding(.top, lineY)
+
+            HStack(spacing: 0) {
+                ForEach(Array(steps.enumerated()), id: \.offset) { idx, s in
+                    progressStepIcon(
+                        label: s.label,
+                        system: s.system,
+                        state: stepState(idx: idx, active: active),
+                        boxSize: iconBox
+                    )
+                    .frame(maxWidth: .infinity)
                 }
             }
         }
@@ -320,7 +325,7 @@ struct TrackingDetailView: View {
         return .pending
     }
 
-    private func progressStepIcon(label: String, system: String, state: StepDisplayState) -> some View {
+    private func progressStepIcon(label: String, system: String, state: StepDisplayState, boxSize: CGFloat) -> some View {
         let size: CGFloat = state == .active ? 52 : 44
         let (bg, border, fg): (Color, Color, Color) = {
             switch state {
@@ -331,6 +336,7 @@ struct TrackingDetailView: View {
             }
         }()
         return VStack(spacing: 6) {
+            // 固定容器：所有 icon 視覺中心都會落在 boxSize/2，連接線才能精準穿過
             ZStack {
                 Circle().fill(bg)
                 Circle().stroke(border, lineWidth: 3)
@@ -349,7 +355,7 @@ struct TrackingDetailView: View {
                     .scaleEffect(state == .active ? 1.18 : 1)
                     .opacity(state == .active ? 1 : 0)
             )
-            .offset(y: state == .active ? -4 : 0)
+            .frame(width: boxSize, height: boxSize)
 
             Text(label)
                 .font(.system(size: 12, weight: .heavy))
@@ -364,34 +370,42 @@ struct TrackingDetailView: View {
     private func ctaButton(_ task: TrackingTask) -> some View {
         let state = currentStepIndex(task)
         let isPassed = state == 3
-        let isYours = task.userNumber.map { task.currentNumber == $0 } ?? false
+        let isYours = task.userNumber.map { task.currentNumber == $0 && task.currentNumber > 0 } ?? false
         let isNear = state == 2
+        let isUncalled = task.currentNumber == 0
+        let aheadCount = max(0, (task.userNumber ?? 0) - task.currentNumber)
 
         let (title, sub, gradient, shadow, icon): (String, String, [Color], Color, String) = {
+            if isUncalled {
+                return ("尚未開始叫號", "醫師還沒開始看診，請稍候",
+                        [Color(hex: "#F2EEE1"), Color(hex: "#E3DCC6")],
+                        Color(hex: "#C9BFA3"),
+                        "clock")
+            }
             if isPassed {
-                return ("已過號", "您的號碼已經過了",
+                return ("您已過號", "請儘速前往診間",
                         [Color.appDanger, Color.appDangerD],
                         Color(hex: "#7A2121"),
                         "exclamationmark.triangle.fill")
             }
             if isYours {
-                return ("輪到您了", "請準備就緒",
+                return ("輪到您了！", "請立即前往診間報到",
                         [Color.appAccent, Color.appAccentD],
                         Color.appAccentDD,
                         "bell.fill")
             }
             if isNear {
-                return ("快到您了", "請就近準備",
+                return ("快到號囉！", "建議準備前往診間",
                         [Color.appAccent, Color.appAccentD],
                         Color.appAccentDD,
                         "bell.fill")
             }
-            return ("等候中", "請您稍候看診進度",
+            return ("看診中 請耐心等候", "還有 \(aheadCount) 人",
                     [Color(hex: "#F2EEE1"), Color(hex: "#E3DCC6")],
                     Color(hex: "#C9BFA3"),
-                    "clock")
+                    "person.fill")
         }()
-        let isWaiting = !isPassed && !isYours && !isNear
+        let isWaiting = isUncalled || (!isPassed && !isYours && !isNear)
 
         return Button {
             Task { await trackingService.refreshAllTasks() }
@@ -483,15 +497,13 @@ struct TrackingDetailView: View {
     }
 
     private func etaText(_ task: TrackingTask) -> String {
-        if let u = task.userNumber {
-            if task.currentNumber > u { return "您的號碼已經過了" }
-            if task.currentNumber == u { return "輪到您了，請盡快至診間" }
-            if let mins = task.estimatedMinutes {
-                return "預估還需 \(mins) 分鐘輪到您"
-            }
-            return "還差 \(u - task.currentNumber) 號輪到您"
-        }
-        return "等候醫院資料中…"
+        guard let u = task.userNumber else { return "等候醫院資料中…" }
+        if task.currentNumber == 0 { return "醫師尚未開始看診" }
+        if task.currentNumber > u { return "目前已看到第 \(task.currentNumber) 號" }
+        if task.currentNumber == u { return "請立即前往診間" }
+        let ahead = u - task.currentNumber
+        let upper = ahead <= 3 ? ahead * 6 : ahead * 8
+        return "預估 \(ahead * 3)-\(upper) 分鐘後到您"
     }
 
     /// 0=registered, 1=seeing, 2=near, 3=passed
