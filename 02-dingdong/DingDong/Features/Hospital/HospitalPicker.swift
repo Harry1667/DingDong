@@ -26,6 +26,8 @@ struct HospitalPicker<Destination: View>: View {
     }
 
     private func isClosed(_ h: SimpleHospital) -> Bool {
+        // 院區拆分的醫院（tsgh 三院區）：優先看 vid 層級的判斷，避免某院區後端 0 筆卻顯示可點
+        if let branchOpen = vm.branchOpenStatus[h.vid] { return !branchOpen }
         guard let open = vm.hospitalStatus[h.code] else { return false }
         return !open
     }

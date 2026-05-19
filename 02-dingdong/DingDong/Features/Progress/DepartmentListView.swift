@@ -109,18 +109,31 @@ struct DepartmentListView: View {
 
     private var noDataView: some View {
         let offHours = !TrackingService.isOperatingHours()
+        // 後端有回資料但被 branch prefix 過濾光：典型如三軍總「台北門診」當下無排診
+        let filteredOut = !vm.progressData.isEmpty && sortedDepartments.isEmpty
         return VStack(spacing: 14) {
             Text(offHours ? "🌙" : "📋").font(.system(size: 48))
-            Text(offHours ? "目前非看診時間" : "今日無看診資料")
+            Text(offHours
+                ? "目前非看診時間"
+                : (filteredOut ? "此院區目前無看診" : "目前無法取得看診資料"))
                 .font(.system(size: 18, weight: .heavy))
                 .foregroundStyle(Color.appInk)
             Text(offHours
                 ? "看診時間為週一至週六 07:00–21:00\n請於開診後再查詢"
-                : "此醫院今日可能未開診，或資料尚未更新")
+                : (filteredOut
+                    ? "此院區今天沒有排診\n請返回改試其他院區"
+                    : "醫院系統可能暫停，或資料尚未更新\n請稍候再試"))
                 .font(.system(size: 15))
                 .foregroundStyle(Color.appInkSoft)
                 .multilineTextAlignment(.center)
                 .lineSpacing(4)
+            if !offHours && !filteredOut {
+                SimpleSecondaryButton(title: "立即重試") {
+                    Task { await vm.refresh() }
+                }
+                .padding(.horizontal, 60)
+                .padding(.top, 6)
+            }
         }
         .frame(maxWidth: .infinity).padding(.top, 40)
     }

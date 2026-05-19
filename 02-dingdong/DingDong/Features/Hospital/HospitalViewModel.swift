@@ -6,6 +6,9 @@ final class HospitalViewModel: ObservableObject {
     @Published var allHospitals: [Hospital] = []
     @Published var searchResults: [Hospital] = []
     @Published var hospitalStatus: [String: Bool] = [:]   // code → isOpen
+    /// 院區層級 open（vid → isOpen），用 progress 資料依 prefix 算出。
+    /// 例：`tsgh:台北門` 若該前綴下沒任何 dept 即為 false，但 `tsgh` 整體可能仍是 open=true。
+    @Published var branchOpenStatus: [String: Bool] = [:]
     @Published var isLoading = false
     @Published var errorMessage: String?
     @Published var searchText = ""
@@ -45,6 +48,7 @@ final class HospitalViewModel: ObservableObject {
             async let statusTask = HospitalService.shared.fetchHospitalStatus()
             allHospitals = try await listTask
             hospitalStatus = await statusTask
+            await refreshBranchStatus()
             startAutoRefreshStatus()
         } catch {
             errorMessage = error.localizedDescription
@@ -53,6 +57,30 @@ final class HospitalViewModel: ObservableObject {
 
     func refreshStatus() async {
         hospitalStatus = await HospitalService.shared.fetchHospitalStatus()
+        await refreshBranchStatus()
+    }
+
+    /// 針對有院區拆分的醫院（SimpleHospital.splits），依 prefix 看實際 progress 有沒有對應 dept，
+    /// 補一份 vid → open 的精確判斷。沒資料的院區會被標為休診，避免 HospitalPicker 顯示可點卻進去空白。
+    private func refreshBranchStatus() async {
+        var result: [String: Bool] = [:]
+        for (code, splits) in SimpleHospital.splits {
+            // 整間醫院已休診，所有院區一起標休診
+            if hospitalStatus[code] == false {
+                for s in splits { result[s.vid] = false }
+                continue
+            }
+            do {
+                let prog = try await HospitalService.shared.fetchProgress(hospitalCode: code)
+                let depts = prog.data.map { $0.department }
+                for s in splits {
+                    result[s.vid] = depts.contains { $0.hasPrefix(s.prefix) }
+                }
+            } catch {
+                // fetch 失敗就不覆蓋，沿用 hospitalStatus 的 code-level 判斷
+            }
+        }
+        branchOpenStatus = result
     }
 
     private func startAutoRefreshStatus() {
