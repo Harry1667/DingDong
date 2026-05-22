@@ -14,7 +14,6 @@ service-account*.json
 
 # === 機密目錄 ===
 dindon-web/
-03-Skills/
 _secrets/
 private/
 01-dev/0-run.md
