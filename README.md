@@ -17,3 +17,25 @@
 
 ## 相關
 後端 API：[api-dindon](https://github.com/Harry1667/api-dindon)
+
+---
+
+## English
+
+An iOS app that tracks your queue position at Taiwanese hospitals — register, walk out, and get a push notification when you're about to be called.
+
+### Features
+- Browse 29 hospitals across Taiwan (grouped by region; alias search: 三總, 北榮, 台大, 長庚…)
+- Track by your registration number, or just monitor the current called number
+- Up to 3 doctors at once; auto-refreshes every 30 seconds
+- Local notification when N numbers remain (N is configurable, default 5)
+- Urgent alert when it's your turn (sound + vibration); a separate alert if you miss your number
+- Background monitoring via BGAppRefreshTask
+- Home-screen widget (small = 1 slot, medium = up to 3 slots)
+
+### Tech stack
+- Swift / SwiftUI (iOS 16+)
+- Backend: [api-dindon](https://github.com/Harry1667/api-dindon) (dd.dl-app.com)
+
+### Related
+Backend API: [api-dindon](https://github.com/Harry1667/api-dindon)
